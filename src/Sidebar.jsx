@@ -46,7 +46,7 @@ function AllBoards() {
             className={`${
               activeBoard === board
                 ? "bg-[#635fc7] text-white"
-                : "text-gray-400"
+                : "text-gray-400 hover:bg-[#625fc71e] hover:text-[#635fc7]"
             } flex items-center space-x-4 cursor-pointer py-4 pl-6 w-[90%] rounded-r-full`}
           >
             <TbLayoutBoardSplit className="text-xl" />
