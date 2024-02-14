@@ -3,7 +3,7 @@ import kanbanLightImage from "./assets/kanban-light-logo.svg";
 
 function Header() {
   return (
-    <div className="bg-white flex  items-stretch">
+    <div className="bg-white flex  items-stretch header">
       <div className="flex-[20%] flex items-center max-w-[300px] px-6  border-r border-r-[#e4ebfa]">
         <img src={kanbanLightImage} alt="kanban-logo" />
       </div>
