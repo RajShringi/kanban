@@ -4,6 +4,8 @@ import { IoSunny } from "react-icons/io5";
 import { RiMoonClearFill } from "react-icons/ri";
 import { FaRegEyeSlash } from "react-icons/fa6";
 import Slider from "./Slider";
+import { useDispatch } from "react-redux";
+import { open } from "./slice/modalSlice";
 
 const userBoards = ["Example Board1", "Example Board2", "Example Board3"];
 
@@ -36,6 +38,11 @@ export default Sidebar;
 function AllBoards() {
   const [Boards, setBoards] = useState(userBoards);
   const [activeBoard, setActiveBoard] = useState("Example Board1");
+  const dispatch = useDispatch();
+
+  function createBoard() {
+    dispatch(open({ modal: "board" }));
+  }
 
   return (
     <div>
@@ -55,6 +62,7 @@ function AllBoards() {
         );
       })}
       <button
+        onClick={createBoard}
         className={`flex items-center space-x-4 cursor-pointer py-4 pl-6 text-[#635fc7] rounded-r-full`}
       >
         <TbLayoutBoardSplit className="text-xl" />
