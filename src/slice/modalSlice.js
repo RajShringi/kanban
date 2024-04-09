@@ -1,8 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  isBoardModalVisible: false,
-  isTaskModalVisible: false,
+  isCreateBoardModalVisible: false,
+  isEditBoardModalVisible: false,
+  iscreateTaskModalVisible: false,
+  isEditTaskModalVisible: false,
   isHeaderTooltipVisible: false,
 };
 
@@ -11,11 +13,14 @@ export const modalSlice = createSlice({
   initialState,
   reducers: {
     open: (state, action) => {
-      if (action.payload.modal === "board") {
-        state.isBoardModalVisible = true;
+      if (action.payload.modal === "createBoard") {
+        state.isCreateBoardModalVisible = true;
       }
-      if (action.payload.modal === "task") {
-        state.isTaskModalVisible = true;
+      if (action.payload.modal === "editBoard") {
+        state.isEditBoardModalVisible = true;
+      }
+      if (action.payload.modal === "createTask") {
+        state.iscreateTaskModalVisible = true;
       }
       if (action.payload.tooltip === "header") {
         state.isHeaderTooltipVisible = true;
@@ -23,11 +28,14 @@ export const modalSlice = createSlice({
     },
 
     close: (state, action) => {
-      if (action.payload.modal === "board") {
-        state.isBoardModalVisible = false;
+      if (action.payload.modal === "createBoard") {
+        state.isCreateBoardModalVisible = false;
       }
-      if (action.payload.modal === "task") {
-        state.isTaskModalVisible = false;
+      if (action.payload.modal === "editBoard") {
+        state.isEditBoardModalVisible = false;
+      }
+      if (action.payload.modal === "createTask") {
+        state.iscreateTaskModalVisible = false;
       }
       if (action.payload.tooltip === "header") {
         state.isHeaderTooltipVisible = false;
