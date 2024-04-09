@@ -41,7 +41,7 @@ function AllBoards() {
   const dispatch = useDispatch();
 
   function createBoard() {
-    dispatch(open({ modal: "board" }));
+    dispatch(open({ modal: "createBoard" }));
   }
 
   return (

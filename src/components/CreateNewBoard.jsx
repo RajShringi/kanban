@@ -9,27 +9,22 @@ function CreateNewBoard() {
   const [columns, setColumns] = useState(["", ""]);
   const ref = useRef("");
   const dispatch = useDispatch();
-  const { isBoardModalVisible } = useSelector((state) => state.modal);
+  const { isCreateBoardModalVisible } = useSelector((state) => state.modal);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (ref.current && !ref.current.contains(e.target)) {
-        dispatch(close({ modal: "board" }));
-        setColumns(["", ""]);
+        dispatch(close({ modal: "createBoard" }));
       }
     };
 
-    if (isBoardModalVisible) {
+    if (isCreateBoardModalVisible) {
       document.addEventListener("mousedown", handleClickOutside);
     }
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isBoardModalVisible, close]);
-
-  if (!isBoardModalVisible) {
-    return null;
-  }
+  }, [isCreateBoardModalVisible, close]);
 
   function addColumnInput(e) {
     e.preventDefault();
@@ -48,6 +43,10 @@ function CreateNewBoard() {
     setColumns((prev) => {
       return prev.filter((column, idx) => idx !== index);
     });
+  }
+
+  if (!isCreateBoardModalVisible) {
+    return null;
   }
 
   return ReactDom.createPortal(
