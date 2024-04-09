@@ -4,6 +4,7 @@ import Header from "./Header";
 import { useEffect, useState } from "react";
 import CreateNewBoard from "./components/CreateNewBoard";
 import EditBoard from "./components/EditBoard";
+import CreateNewTask from "./components/CreateNewTask";
 
 function App() {
   const [headerHeight, setHeaderHeight] = useState(0);
@@ -33,6 +34,7 @@ function App() {
       </div>
       <CreateNewBoard />
       <EditBoard />
+      <CreateNewTask />
     </div>
   );
 }
