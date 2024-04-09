@@ -58,7 +58,7 @@ function HeaderTooltip() {
   return (
     <div
       ref={ref}
-      className="absolute flex flex-col gap-4 p-4 bg-white rounded-md w-[40vh] shadow-md top-20 right-0"
+      className="absolute flex flex-col gap-4 p-4 bg-white rounded-md w-[150px] 2xl:w-[200px] shadow-md top-20 right-0"
     >
       <button className="block text-left text-sm text-gray-400 hover:text-gray-700">
         Edit Board
