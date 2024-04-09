@@ -3,6 +3,7 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import { useEffect, useState } from "react";
 import CreateNewBoard from "./components/CreateNewBoard";
+import EditBoard from "./components/EditBoard";
 
 function App() {
   const [headerHeight, setHeaderHeight] = useState(0);
@@ -31,6 +32,7 @@ function App() {
         </div>
       </div>
       <CreateNewBoard />
+      <EditBoard />
     </div>
   );
 }
