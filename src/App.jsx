@@ -5,14 +5,25 @@ import { useEffect, useState } from "react";
 import CreateNewBoard from "./components/CreateNewBoard";
 import EditBoard from "./components/EditBoard";
 import CreateNewTask from "./components/CreateNewTask";
+import { useDispatch } from "react-redux";
+import { fetchColumns, selectBoard } from "./slice/boardSlice";
 
 function App() {
   const [headerHeight, setHeaderHeight] = useState(0);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const header = document.querySelector(".header");
     if (header) {
       setHeaderHeight(header.offsetHeight);
+    }
+  }, []);
+
+  useEffect(() => {
+    const board = JSON.parse(localStorage.getItem("board")) || "";
+    if (board) {
+      dispatch(selectBoard(board));
+      dispatch(fetchColumns(board.columns));
     }
   }, []);
 
