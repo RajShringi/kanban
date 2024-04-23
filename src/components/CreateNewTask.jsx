@@ -3,14 +3,21 @@ import ReactDom from "react-dom";
 import { RxCross2 } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
 import { close } from "../slice/modalSlice";
+import { createNewtask, postNewTask, updateTaskId } from "../slice/boardSlice";
 
 export default function CreateNewTask() {
-  const [subTasks, setSubTasks] = useState([""]);
-  const [status, setStatus] = useState(["todo", "doing", "completed"]);
-  const [currentStatus, setCurrentStatus] = useState("");
+  const [task, setTask] = useState({
+    title: "",
+    description: "",
+    subTasks: [""],
+    status: "",
+  });
+
   const [isListOpen, setIsListOpen] = useState(false);
   const dispatch = useDispatch();
   const { iscreateTaskModalVisible } = useSelector((state) => state.modal);
+  const { activeBoard } = useSelector((state) => state.board);
+  const { user } = useSelector((state) => state.user);
   const ref = useRef(null);
 
   useEffect(() => {
@@ -29,20 +36,23 @@ export default function CreateNewTask() {
   }, [iscreateTaskModalVisible, close]);
 
   function handleSubTaskInput(e, index) {
-    setSubTasks((prev) => {
-      const newSubTasks = [...prev];
+    setTask((prev) => {
+      const newSubTasks = [...prev.subTasks];
       newSubTasks[index] = e.target.value;
-      return newSubTasks;
+      return { ...prev, subTasks: newSubTasks };
     });
   }
 
   function deleteSubTask(index) {
-    setSubTasks(subTasks.filter((subTask, idx) => idx !== index));
+    setTask((prev) => ({
+      ...prev,
+      subTasks: prev.subTasks.filter((subTask, idx) => idx !== index),
+    }));
   }
 
   function addNewSubTask(e) {
     e.preventDefault();
-    setSubTasks([...subTasks, ""]);
+    setTask((prev) => ({ ...prev, subTasks: [...prev.subTasks, ""] }));
   }
 
   function toggleList(e) {
@@ -51,8 +61,38 @@ export default function CreateNewTask() {
   }
 
   function selectStatus(status) {
-    setCurrentStatus(status);
+    setTask((prev) => ({ ...prev, status }));
     setIsListOpen(false);
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const newTask = {
+      name: task.title,
+      description: task.description,
+      subTasks: task.subTasks,
+      column: task.status._id,
+    };
+    dispatch(createNewtask({ task: newTask }));
+    dispatch(close({ modal: "createTask" }));
+    try {
+      // const res = await fetch("http://localhost:3000/api/tasks", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     authorization: `Token ${user.token}`,
+      //   },
+      //   body: JSON.stringify({
+      //     task: newTask,
+      //   }),
+      // });
+      // const json = await res.json();
+      // dispatch(updateTaskId({ task: json.task }));
+      dispatch(postNewTask(newTask));
+      setTask({ title: "", description: "", subTasks: [""], status: "" });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   if (!iscreateTaskModalVisible) {
@@ -72,6 +112,10 @@ export default function CreateNewTask() {
               className="block w-full px-2 py-3 border border-gray-300 rounded-md text-sm outline-none"
               type="text"
               placeholder="e.g. Start learning things"
+              value={task.title}
+              onChange={(e) =>
+                setTask((prev) => ({ ...prev, title: e.target.value }))
+              }
             />
           </div>
 
@@ -82,6 +126,10 @@ export default function CreateNewTask() {
             <textarea
               className="block w-full px-2 py-3 border border-gray-300 rounded-md text-sm outline-none resize-none"
               placeholder="e.g. Start learning things"
+              value={task.description}
+              onChange={(e) =>
+                setTask((prev) => ({ ...prev, description: e.target.value }))
+              }
             ></textarea>
           </div>
 
@@ -92,7 +140,7 @@ export default function CreateNewTask() {
             <div className="flex flex-col gap-4">
               {/* repeat this for column */}
               <div className="flex flex-col gap-4 max-h-[150px] overflow-auto">
-                {subTasks.map((subTask, index) => {
+                {task.subTasks.map((subTask, index) => {
                   return (
                     <div
                       key={index}
@@ -130,18 +178,20 @@ export default function CreateNewTask() {
               className="block px-2 py-3 border border-gray-300 rounded-md w-full text-left text-sm"
               onClick={toggleList}
             >
-              {currentStatus === "" ? "Select a status" : currentStatus}
+              {task.status === "" ? "Select a status" : task.status.name}
             </button>
             {isListOpen && (
               <ul className="absolute top-20 bg-white left-0 right-0 shadow-md rounded-md p-2">
-                {status.map((sta, index) => {
+                {activeBoard.columns.map((column, index) => {
                   return (
                     <li
-                      onClick={() => selectStatus(sta)}
-                      key={index}
+                      onClick={() =>
+                        selectStatus({ _id: column._id, name: column.name })
+                      }
+                      key={column._id}
                       className="text-gray-400 hover:text-gray-800 cursor-pointer text-sm py-1"
                     >
-                      {sta}
+                      {column.name}
                     </li>
                   );
                 })}
@@ -149,7 +199,10 @@ export default function CreateNewTask() {
             )}
           </div>
 
-          <button className="block mt-4 w-full bg-[#635fc7] hover:bg-[#635fc8c9] text-white px-6 py-3 rounded-full font-bold">
+          <button
+            className="block mt-4 w-full bg-[#635fc7] hover:bg-[#635fc8c9] text-white px-6 py-3 rounded-full font-bold"
+            onClick={handleSubmit}
+          >
             Create Task
           </button>
         </form>
