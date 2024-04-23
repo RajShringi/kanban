@@ -4,10 +4,9 @@ import { IoSunny } from "react-icons/io5";
 import { RiMoonClearFill } from "react-icons/ri";
 import { FaRegEyeSlash } from "react-icons/fa6";
 import Slider from "./Slider";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { open } from "./slice/modalSlice";
-
-const userBoards = ["Example Board1", "Example Board2", "Example Board3"];
+import { fetchColumns, selectBoard } from "./slice/boardSlice";
 
 function Sidebar() {
   return (
@@ -36,28 +35,34 @@ function Sidebar() {
 export default Sidebar;
 
 function AllBoards() {
-  const [Boards, setBoards] = useState(userBoards);
-  const [activeBoard, setActiveBoard] = useState("Example Board1");
   const dispatch = useDispatch();
+  const { boards, activeBoard } = useSelector((state) => state.board);
 
   function createBoard() {
     dispatch(open({ modal: "createBoard" }));
   }
 
+  function handleClickBoard(board) {
+    console.log({ board });
+    dispatch(selectBoard(board));
+    dispatch(fetchColumns(board.columns));
+  }
+
   return (
     <div>
-      {Boards.map((board, index) => {
+      {boards.map((board) => {
         return (
           <div
-            key={index}
+            key={board._id}
             className={`${
-              activeBoard === board
+              activeBoard._id === board._id
                 ? "bg-[#635fc7] text-white"
                 : "text-gray-400 hover:bg-[#625fc71e] hover:text-[#635fc7]"
             } flex items-center space-x-4 cursor-pointer py-4 pl-6 w-[90%] rounded-r-full`}
+            onClick={() => handleClickBoard(board)}
           >
             <TbLayoutBoardSplit className="text-xl" />
-            <h3 className="font-bold">{board}</h3>
+            <h3 className="font-bold">{board.name}</h3>
           </div>
         );
       })}
