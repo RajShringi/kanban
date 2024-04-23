@@ -3,10 +3,20 @@ import kanbanLightImage from "./assets/kanban-light-logo.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { close, open } from "./slice/modalSlice";
 import { useEffect, useRef } from "react";
+import { fetchUser } from "./slice/userSlice";
+import { fetchBoards } from "./slice/boardSlice";
 
 function Header() {
   const dispatch = useDispatch();
-
+  // <DeleteCode>
+  const { user } = useSelector((state) => state.user);
+  const { activeBoard } = useSelector((state) => state.board);
+  useEffect(() => {
+    if (user) {
+      dispatch(fetchBoards());
+    }
+  }, [user]);
+  // </DeleteCode>
   const openHeaderTooltip = () => {
     dispatch(open({ tooltip: "header" }));
   };
@@ -14,6 +24,12 @@ function Header() {
   const createTask = () => {
     dispatch(open({ modal: "createTask" }));
   };
+
+  // Delete this code <DeleteCode>
+  const fakeUserLogin = () => {
+    dispatch(fetchUser());
+  };
+  //Delete this code </DeleteCode>
 
   return (
     <div className="bg-white flex items-stretch header">
@@ -24,8 +40,15 @@ function Header() {
         <h2 className="font-bold text-2xl">Platform Launch</h2>
         <div className="space-x-4 flex items-center relative">
           <button
-            className="bg-[#635fc7] hover:bg-[#635fc8c9] text-white px-6 py-3 rounded-full font-bold"
+            className="px-6 py-3 rounded-full bg-indigo-500 text-white"
+            onClick={fakeUserLogin}
+          >
+            {user ? user.name : "fake user"}
+          </button>
+          <button
+            className="bg-[#635fc7] hover:bg-[#635fc8c9] text-white px-6 py-3 rounded-full font-bold disabled:cursor-not-allowed"
             onClick={createTask}
+            disabled={Object.keys(activeBoard).length === 0}
           >
             + Add new task
           </button>
