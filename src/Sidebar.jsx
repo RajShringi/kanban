@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { open } from "./slice/modalSlice";
 import { fetchColumns, selectBoard } from "./slice/boardSlice";
 
-function Sidebar() {
+function Sidebar({ setIsSidebarHidden }) {
   return (
     <div className="bg-white min-h-full border-r border-[#e4ebfa] flex flex-col pt-4 pb-8 justify-between">
       <div className="space-y-4">
@@ -24,7 +24,10 @@ function Sidebar() {
           <Slider />
           <RiMoonClearFill className="text-xl text-gray-400" />
         </div>
-        <button className="flex items-center space-x-4 cursor-pointer py-4 pl-6 pr-6 text-gray-400 rounded-r-full hover:text-[#635fc7]">
+        <button
+          onClick={() => setIsSidebarHidden(true)}
+          className="flex items-center space-x-4 cursor-pointer py-4 pl-6 pr-6 text-gray-400 rounded-r-full hover:text-[#635fc7]"
+        >
           <FaRegEyeSlash className="text-xl" />
           <p className="font-bold">Hide Sidebar</p>
         </button>
@@ -43,7 +46,7 @@ function AllBoards() {
   }
 
   function handleClickBoard(board) {
-    console.log({ board });
+    console.log(board, "sidebar");
     dispatch(selectBoard(board));
     dispatch(fetchColumns(board.columns));
   }
