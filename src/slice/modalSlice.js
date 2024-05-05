@@ -6,6 +6,7 @@ const initialState = {
   iscreateTaskModalVisible: false,
   isEditTaskModalVisible: false,
   isHeaderTooltipVisible: false,
+  isTaskDetailsVisible: false,
 };
 
 export const modalSlice = createSlice({
@@ -22,8 +23,14 @@ export const modalSlice = createSlice({
       if (action.payload.modal === "createTask") {
         state.iscreateTaskModalVisible = true;
       }
+      if (action.payload.modal === "editTask") {
+        state.isEditTaskModalVisible = true;
+      }
       if (action.payload.tooltip === "header") {
         state.isHeaderTooltipVisible = true;
+      }
+      if (action.payload.modal === "taskDetails") {
+        state.isTaskDetailsVisible = true;
       }
     },
 
@@ -37,8 +44,14 @@ export const modalSlice = createSlice({
       if (action.payload.modal === "createTask") {
         state.iscreateTaskModalVisible = false;
       }
+      if (action.payload.modal === "editTask") {
+        state.isEditTaskModalVisible = false;
+      }
       if (action.payload.tooltip === "header") {
         state.isHeaderTooltipVisible = false;
+      }
+      if (action.payload.modal === "taskDetails") {
+        state.isTaskDetailsVisible = false;
       }
     },
   },
