@@ -4,7 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { close, open } from "./slice/modalSlice";
 import { useEffect, useRef } from "react";
 import { fetchUser } from "./slice/userSlice";
-import { fetchBoards } from "./slice/boardSlice";
+import {
+  deleteBoard,
+  deleteBoardReq,
+  fetchBoards,
+  fetchColumns,
+  selectBoard,
+} from "./slice/boardSlice";
 
 function Header() {
   const dispatch = useDispatch();
@@ -32,8 +38,8 @@ function Header() {
   //Delete this code </DeleteCode>
 
   return (
-    <div className="bg-white flex items-stretch header">
-      <div className="flex-[20%] flex items-center max-w-[300px] px-6  border-r border-r-[#e4ebfa]">
+    <div className="bg-white flex  header">
+      <div className="flex-[20%] max-w-[300px] flex items-center px-6  border-r border-r-[#e4ebfa]">
         <img src={kanbanLightImage} alt="kanban-logo" />
       </div>
       <div className="flex-[80%] flex justify-between items-center px-4 py-6">
@@ -53,7 +59,7 @@ function Header() {
             + Add new task
           </button>
           <button onClick={openHeaderTooltip}>
-            <MdOutlineMoreVert className="text-2xl text-gray-400" />
+            <MdOutlineMoreVert className="text-2xl text-gray-400 cursor-pointer" />
           </button>
           <HeaderTooltip />
         </div>
@@ -66,6 +72,7 @@ function HeaderTooltip() {
   const { isHeaderTooltipVisible } = useSelector((state) => state.modal);
   const dispatch = useDispatch();
   const ref = useRef(null);
+  const { activeBoard, boards } = useSelector((state) => state.board);
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -84,6 +91,17 @@ function HeaderTooltip() {
 
   function editBoard() {
     dispatch(open({ modal: "editBoard" }));
+    dispatch(close({ tooltip: "header" }));
+  }
+
+  function handleDeleteBoard() {
+    dispatch(deleteBoardReq(activeBoard._id));
+    dispatch(deleteBoard(activeBoard._id));
+    const filterBoards = boards.filter((brd) => brd._id !== activeBoard._id);
+    const board = !filterBoards[0] ? "" : filterBoards[0];
+    const columns = !filterBoards[0] ? "" : filterBoards[0].columns;
+    dispatch(selectBoard(board));
+    dispatch(fetchColumns(columns));
     dispatch(close({ tooltip: "header" }));
   }
 
@@ -106,7 +124,10 @@ function HeaderTooltip() {
       <button className="block text-left text-sm text-gray-400 hover:text-gray-700">
         Clear Board
       </button>
-      <button className="block text-left text-sm text-red-400 hover:text-red-600">
+      <button
+        onClick={handleDeleteBoard}
+        className="block text-left text-sm text-red-400 hover:text-red-600"
+      >
         Delete Board
       </button>
     </div>
