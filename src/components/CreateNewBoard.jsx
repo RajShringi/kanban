@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import ReactDom from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import { close } from "../slice/modalSlice";
+import { createBoard, createNewBoardReq } from "../slice/boardSlice";
 
 function CreateNewBoard() {
   const [boardName, SetBoardName] = useState("");
@@ -43,6 +44,13 @@ function CreateNewBoard() {
     setColumns((prev) => {
       return prev.filter((column, idx) => idx !== index);
     });
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    dispatch(createBoard({ name: boardName, columns }));
+    dispatch(createNewBoardReq({ name: boardName, columns }));
+    dispatch(close({ modal: "createBoard" }));
   }
 
   if (!isCreateBoardModalVisible) {
@@ -102,7 +110,10 @@ function CreateNewBoard() {
               </button>
             </div>
           </div>
-          <button className="block mt-4 w-full bg-[#635fc7] hover:bg-[#635fc8c9] text-white px-6 py-3 rounded-full font-bold">
+          <button
+            onClick={handleSubmit}
+            className="block mt-4 w-full bg-[#635fc7] hover:bg-[#635fc8c9] text-white px-6 py-3 rounded-full font-bold"
+          >
             Create New Board
           </button>
         </form>
