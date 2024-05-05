@@ -6,15 +6,22 @@
   appearance: none;
 }
 
-.board-container::-webkit-scrollbar {
+::-webkit-scrollbar {
   width: 0.75rem;
   /* height: 0.75rem; width of the entire scrollbar */
 }
 
-.board-container::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   background: white; /* color of the tracking area */
 }
 
-.board-container::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
   background-color: #635fc7; /* color of the scroll thumb */
+}
+
+textarea,
+input {
+  font: inherit;
+  letter-spacing: inherit;
+  word-spacing: inherit;
 }
