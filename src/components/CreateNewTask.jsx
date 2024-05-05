@@ -3,7 +3,8 @@ import ReactDom from "react-dom";
 import { RxCross2 } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
 import { close } from "../slice/modalSlice";
-import { createNewtask, postNewTask, updateTaskId } from "../slice/boardSlice";
+import { createTask, postNewTask } from "../slice/boardSlice";
+import { nanoid } from "@reduxjs/toolkit";
 
 export default function CreateNewTask() {
   const [task, setTask] = useState({
@@ -67,28 +68,18 @@ export default function CreateNewTask() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    const taskId = nanoid();
     const newTask = {
       name: task.title,
       description: task.description,
       subTasks: task.subTasks,
       column: task.status._id,
     };
-    dispatch(createNewtask({ task: newTask }));
-    dispatch(close({ modal: "createTask" }));
+
     try {
-      // const res = await fetch("http://localhost:3000/api/tasks", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     authorization: `Token ${user.token}`,
-      //   },
-      //   body: JSON.stringify({
-      //     task: newTask,
-      //   }),
-      // });
-      // const json = await res.json();
-      // dispatch(updateTaskId({ task: json.task }));
-      dispatch(postNewTask(newTask));
+      dispatch(createTask({ task: { ...newTask, _id: taskId } }));
+      dispatch(close({ modal: "createTask" }));
+      dispatch(postNewTask({ newTask: newTask, reduxTaskId: taskId }));
       setTask({ title: "", description: "", subTasks: [""], status: "" });
     } catch (error) {
       console.log(error);
@@ -101,7 +92,7 @@ export default function CreateNewTask() {
 
   return ReactDom.createPortal(
     <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-black/75">
-      <div ref={ref} className="bg-white p-4 rounded-md max-w-[480px] w-full">
+      <div ref={ref} className="bg-white p-4 rounded-md  w-2/6">
         <h3 className="text-xl font-semibold mb-6">Add New Task</h3>
         <form>
           <div className="mb-6">
