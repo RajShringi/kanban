@@ -1,4 +1,13 @@
+import { useDispatch } from "react-redux";
+import { selectTask } from "./slice/boardSlice";
+import { open } from "./slice/modalSlice";
+
 function Column({ column }) {
+  const dispatch = useDispatch();
+  function handleClickOnTask(task) {
+    dispatch(selectTask(task));
+    dispatch(open({ modal: "taskDetails" }));
+  }
   return (
     <div className="flex flex-col gap-4 w-[280px]">
       {/* Column Name */}
@@ -15,6 +24,7 @@ function Column({ column }) {
         column.tasks.map((task) => {
           return (
             <div
+              onClick={() => handleClickOnTask(task)}
               key={task._id}
               className="bg-white shadow-md rounded-md p-4 cursor-pointer"
             >
