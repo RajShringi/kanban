@@ -3,19 +3,24 @@ import ReactDom from "react-dom";
 import { RxCross2 } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
 import { close } from "../slice/modalSlice";
+import { editBoard, editBoardReq } from "../slice/boardSlice";
 
 export default function EditBoard() {
-  const [boardName, SetBoardName] = useState("");
   const [columns, setColumns] = useState(["", ""]);
+  const { activeBoard } = useSelector((state) => state.board);
+  const boardInfo = {
+    _id: activeBoard._id,
+    name: activeBoard.name,
+    columns: activeBoard.columns,
+  };
+  const columnsBeforeUpdate = activeBoard.columns;
+  const [board, setBoard] = useState(boardInfo);
   const ref = useRef(null);
   const { isEditBoardModalVisible } = useSelector((state) => state.modal);
   const dispatch = useDispatch();
 
   useEffect(() => {
     function handleClickOutside(e) {
-      // if (ref.current && !ref.current.contains(e.target)) {
-      //   dispatch(close({ modal: "editBoard" }));
-      // }
       if (ref.current && !ref.current.contains(e.target)) {
         dispatch(close({ modal: "editBoard" }));
       }
@@ -32,21 +37,66 @@ export default function EditBoard() {
 
   function addColumnInput(e) {
     e.preventDefault();
-    setColumns([...columns, ""]);
+    setBoard((prev) => ({
+      ...prev,
+      columns: [...prev.columns, { name: "" }],
+    }));
   }
 
   function handleColumnInput(e, index) {
-    setColumns((prev) => {
-      const col = [...prev];
-      col[index] = e.target.value;
-      return col;
+    setBoard((prev) => {
+      const newColumns = JSON.parse(JSON.stringify([...prev.columns]));
+      newColumns[index].name = e.target.value;
+      return { ...prev, columns: newColumns };
     });
   }
 
   function deleteColumnInput(index) {
-    setColumns((prev) => {
-      return prev.filter((column, idx) => idx !== index);
-    });
+    setBoard((prev) => ({
+      ...prev,
+      columns: prev.columns.filter((col, idx) => idx !== index),
+    }));
+  }
+
+  function columnsActions() {
+    let addUpdateActions = board.columns
+      .map((column) => {
+        console.log({ column });
+        if (!Object.hasOwn(column, "_id")) {
+          return { name: column.name, action: "add" };
+        }
+        const index = columnsBeforeUpdate.findIndex(
+          (col) => col._id === column._id
+        );
+        if (index !== -1 && columnsBeforeUpdate[index].name !== column.name) {
+          return { _id: column._id, name: column.name, action: "update" };
+        }
+      })
+      .filter(Boolean);
+
+    const deletedColumns = columnsBeforeUpdate
+      .map((column) => {
+        if (board.columns.findIndex((col) => col._id === column._id) === -1) {
+          return { _id: column._id, action: "delete", name: column.name };
+        }
+      })
+      .filter(Boolean);
+    const columnsWithActions = [...addUpdateActions, ...deletedColumns];
+    console.log(columnsWithActions, "columnsActions");
+    return columnsWithActions;
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    dispatch(
+      editBoardReq({
+        _id: board._id,
+        name: board.name,
+        columns: columnsActions(),
+      })
+    );
+    dispatch(editBoard({ board }));
+    dispatch(close({ modal: "editBoard" }));
   }
 
   if (!isEditBoardModalVisible) {
@@ -66,8 +116,10 @@ export default function EditBoard() {
               className="block w-full px-2 py-3 border border-gray-300 rounded-md text-sm outline-none"
               type="text"
               placeholder="e.g. Web Development"
-              value={boardName}
-              onChange={(e) => SetBoardName(e.target.value)}
+              value={board.name}
+              onChange={(e) =>
+                setBoard((prev) => ({ ...prev, name: e.target.value }))
+              }
             />
           </div>
           <div>
@@ -77,7 +129,7 @@ export default function EditBoard() {
             <div className="flex flex-col gap-4">
               {/* repeat this for column */}
               <div className="flex flex-col gap-4 max-h-[150px] overflow-auto">
-                {columns.map((columnInput, index) => {
+                {board.columns.map((column, index) => {
                   return (
                     <div
                       key={index}
@@ -87,7 +139,7 @@ export default function EditBoard() {
                         className="block px-2 py-3 border border-gray-300 rounded-md w-[95%] outline-none text-sm"
                         type="text"
                         placeholder="column name"
-                        value={columnInput}
+                        value={column.name}
                         onChange={(e) => handleColumnInput(e, index)}
                       />
                       <RxCross2
@@ -106,8 +158,11 @@ export default function EditBoard() {
               </button>
             </div>
           </div>
-          <button className="block mt-4 w-full bg-[#635fc7] hover:bg-[#635fc8c9] text-white px-6 py-3 rounded-full font-bold">
-            Create New Board
+          <button
+            onClick={handleSubmit}
+            className="block mt-4 w-full bg-[#635fc7] hover:bg-[#635fc8c9] text-white px-6 py-3 rounded-full font-bold"
+          >
+            Edit Board
           </button>
         </form>
       </div>
