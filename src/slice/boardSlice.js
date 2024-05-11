@@ -1,3 +1,4 @@
+import { arrayMove } from "@dnd-kit/sortable";
 import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
 import { GiConsoleController } from "react-icons/gi";
 
@@ -259,6 +260,28 @@ export const deleteBoardReq = createAsyncThunk(
   }
 );
 
+export const moveTaskReq = createAsyncThunk(
+  "board/moveTaskReq",
+  async (moveInfo, { getState }) => {
+    const state = getState();
+    const token = state.user.user.token;
+    try {
+      const res = await fetch(`http://localhost:3000/api/tasks/moveTask`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Token ${token}`,
+        },
+        body: JSON.stringify(moveInfo),
+      });
+      const json = await res.json();
+      return json;
+    } catch (error) {
+      return error;
+    }
+  }
+);
+
 export const boardSlice = createSlice({
   name: "board",
   initialState,
@@ -416,6 +439,48 @@ export const boardSlice = createSlice({
       const board = state.boards[0] === undefined ? "" : state.boards[0];
       localStorage.setItem("board", JSON.stringify(board));
     },
+
+    moveTask: (state, action) => {
+      console.log(action.payload);
+      const activeBoard = JSON.parse(JSON.stringify(state.activeBoard));
+      const {
+        taskId,
+        destinationColumn,
+        sourceColumn,
+        dragIndex,
+        destinationIndex,
+      } = action.payload;
+      const sourceColumnIndex = activeBoard.columns.findIndex(
+        (col) => col._id === sourceColumn
+      );
+
+      const destinationColumnIndex = activeBoard.columns.findIndex(
+        (col) => col._id === destinationColumn
+      );
+
+      if (sourceColumnIndex === -1) return;
+      if (destinationColumnIndex === -1) return;
+
+      const task = activeBoard.columns[sourceColumnIndex].tasks[dragIndex];
+      task.column = destinationColumn;
+
+      activeBoard.columns[sourceColumnIndex].tasks = activeBoard.columns[
+        sourceColumnIndex
+      ].tasks.filter((task) => task._id !== taskId);
+
+      activeBoard.columns[destinationColumnIndex].tasks = [
+        ...activeBoard.columns[destinationColumnIndex].tasks.slice(
+          0,
+          destinationIndex
+        ),
+        task,
+        ...activeBoard.columns[destinationColumnIndex].tasks.slice(
+          destinationIndex
+        ),
+      ];
+
+      state.activeBoard = activeBoard;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchBoards.fulfilled, (state, action) => {
@@ -432,12 +497,6 @@ export const boardSlice = createSlice({
 
     builder.addCase(postNewTask.fulfilled, (state, action) => {
       const { task, reduxTaskId } = action.payload;
-      // console.log({ column, _id }, "postNewTask fulfilled");
-      // console.log(action.payload);
-      // find column index
-      // find task index
-      // replace the task with action.payload.task
-
       const columnIndex = state.activeBoard.columns.findIndex(
         (col) => col._id === task.column
       );
@@ -446,13 +505,6 @@ export const boardSlice = createSlice({
       );
       state.activeBoard.columns[columnIndex].tasks[taskIndex] = task;
       console.log(task, columnIndex, taskIndex, reduxTaskId);
-
-      // state.activeBoard.columns = state.activeBoard.columns.map((col) => {
-      //   if (col._id === column) {
-      //     col.tasks[col.tasks.length - 1]._id = _id;
-      //   }
-      //   return col;
-      // });
     });
 
     builder.addCase(postNewTask.rejected, (state, action) => {
@@ -520,6 +572,10 @@ export const boardSlice = createSlice({
     builder.addCase(deleteBoardReq.fulfilled, (state, action) => {
       console.log(action.payload, "deleteBoardreq");
     });
+
+    builder.addCase(moveTaskReq.fulfilled, (state, action) => {
+      console.log("task moved successfully");
+    });
   },
 });
 
@@ -534,5 +590,6 @@ export const {
   removeTask,
   createBoard,
   deleteBoard,
+  moveTask,
 } = boardSlice.actions;
 export default boardSlice.reducer;
