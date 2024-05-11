@@ -116,17 +116,22 @@ function HeaderTooltip() {
     >
       <button
         onClick={editBoard}
-        className="block text-left text-sm text-gray-400 hover:text-gray-700"
+        className={`block text-left text-sm text-gray-400 hover:text-gray-700 disabled:cursor-not-allowed`}
+        disabled={Object.keys(activeBoard).length === 0}
       >
         Edit Board
       </button>
       {/* all board column are deleted clear board button functionality */}
-      <button className="block text-left text-sm text-gray-400 hover:text-gray-700">
+      <button
+        className="block text-left text-sm text-gray-400 hover:text-gray-700 disabled:cursor-not-allowed"
+        disabled={Object.keys(activeBoard).length === 0}
+      >
         Clear Board
       </button>
       <button
         onClick={handleDeleteBoard}
-        className="block text-left text-sm text-red-400 hover:text-red-600"
+        className="block text-left text-sm text-red-400 hover:text-red-600 disabled:cursor-not-allowed"
+        disabled={Object.keys(activeBoard).length === 0}
       >
         Delete Board
       </button>
