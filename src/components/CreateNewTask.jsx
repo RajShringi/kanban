@@ -13,6 +13,11 @@ export default function CreateNewTask() {
     subTasks: [""],
     status: "",
   });
+  const [errors, SetErrors] = useState({
+    titleErr: "",
+    subTasksErr: [""],
+    statusErr: "",
+  });
 
   const [isListOpen, setIsListOpen] = useState(false);
   const dispatch = useDispatch();
@@ -42,6 +47,11 @@ export default function CreateNewTask() {
       newSubTasks[index] = e.target.value;
       return { ...prev, subTasks: newSubTasks };
     });
+    SetErrors((prev) => {
+      const subT = [...prev.subTasksErr];
+      subT[index] = "";
+      return { ...prev, subTasksErr: subT };
+    });
   }
 
   function deleteSubTask(index) {
@@ -49,11 +59,23 @@ export default function CreateNewTask() {
       ...prev,
       subTasks: prev.subTasks.filter((subTask, idx) => idx !== index),
     }));
+    SetErrors((prev) => {
+      return {
+        ...prev,
+        subTasksErr: prev.subTasksErr.filter((subT, idx) => idx !== index),
+      };
+    });
   }
 
   function addNewSubTask(e) {
     e.preventDefault();
     setTask((prev) => ({ ...prev, subTasks: [...prev.subTasks, ""] }));
+    SetErrors((prev) => {
+      return {
+        ...prev,
+        subTasksErr: [...prev.subTasksErr, ""],
+      };
+    });
   }
 
   function toggleList(e) {
@@ -63,11 +85,42 @@ export default function CreateNewTask() {
 
   function selectStatus(status) {
     setTask((prev) => ({ ...prev, status }));
+    SetErrors((prev) => ({ ...prev, statusErr: "" }));
     setIsListOpen(false);
+  }
+
+  function handleTaskTitle(e) {
+    SetErrors((prev) => ({ ...prev, titleErr: "" }));
+    setTask((prev) => ({ ...prev, title: e.target.value }));
+  }
+
+  function validate() {
+    let isValid = true;
+    if (!task.title) {
+      SetErrors((prev) => ({ ...prev, titleErr: "Field can't be empty" }));
+      isValid = false;
+    }
+
+    const subTasksErr = task.subTasks.map((subTask) =>
+      subTask === "" ? "Field can't be empty" : ""
+    );
+    SetErrors((prev) => ({ ...prev, subTasksErr }));
+    if (subTasksErr.some((err) => err !== "")) {
+      isValid = false;
+    }
+
+    if (!task.status) {
+      SetErrors((prev) => ({ ...prev, statusErr: "Select task status" }));
+      isValid = false;
+    }
+    return isValid;
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (!validate()) {
+      return;
+    }
     const taskId = nanoid();
     const newTask = {
       name: task.title,
@@ -100,14 +153,15 @@ export default function CreateNewTask() {
               Title
             </label>
             <input
-              className="block w-full px-2 py-3 border border-gray-300 rounded-md text-sm outline-none"
+              className={`block w-full px-2 py-3 border border-gray-300 rounded-md text-sm outline-none ${
+                errors.titleErr ? "border-red-400" : ""
+              }`}
               type="text"
               placeholder="e.g. Start learning things"
               value={task.title}
-              onChange={(e) =>
-                setTask((prev) => ({ ...prev, title: e.target.value }))
-              }
+              onChange={handleTaskTitle}
             />
+            <span className="text-sm text-red-400">{errors.titleErr}</span>
           </div>
 
           <div className="mb-6">
@@ -133,21 +187,26 @@ export default function CreateNewTask() {
               <div className="flex flex-col gap-4 max-h-[150px] overflow-auto">
                 {task.subTasks.map((subTask, index) => {
                   return (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between gap-2"
-                    >
-                      <input
-                        className="block px-2 py-3 border border-gray-300 rounded-md w-[95%] outline-none text-sm"
-                        type="text"
-                        placeholder="column name"
-                        value={subTask}
-                        onChange={(e) => handleSubTaskInput(e, index)}
-                      />
-                      <RxCross2
-                        onClick={() => deleteSubTask(index)}
-                        className="text-3xl w-[5%]  text-gray-500 cursor-pointer"
-                      />
+                    <div key={index}>
+                      <div className="flex items-center justify-between gap-2">
+                        <input
+                          className={`block px-2 py-3 border border-gray-300 rounded-md w-[95%] outline-none text-sm 
+                           ${
+                             errors.subTasksErr[index] ? "border-red-400" : ""
+                           }`}
+                          type="text"
+                          placeholder="column name"
+                          value={subTask}
+                          onChange={(e) => handleSubTaskInput(e, index)}
+                        />
+                        <RxCross2
+                          onClick={() => deleteSubTask(index)}
+                          className="text-3xl w-[5%]  text-gray-500 cursor-pointer"
+                        />
+                      </div>
+                      <span className="text-sm text-red-400">
+                        {errors.subTasksErr[index]}
+                      </span>
                     </div>
                   );
                 })}
@@ -166,11 +225,15 @@ export default function CreateNewTask() {
               Status
             </label>
             <button
-              className="block px-2 py-3 border border-gray-300 rounded-md w-full text-left text-sm"
+              className={`block px-2 py-3 border border-gray-300 rounded-md w-full text-left text-sm ${
+                errors.statusErr ? "border-red-400" : ""
+              }`}
               onClick={toggleList}
             >
               {task.status === "" ? "Select a status" : task.status.name}
             </button>
+            <span className="text-sm text-red-400">{errors.statusErr}</span>
+
             {isListOpen && (
               <ul className="absolute top-20 bg-white left-0 right-0 shadow-md rounded-md p-2">
                 {activeBoard.columns.map((column, index) => {

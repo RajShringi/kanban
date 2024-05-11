@@ -20,6 +20,10 @@ export default function EditTask() {
   })[0];
   const [task, setTask] = useState({ ...currentTask, status });
   const [isListOpen, setIsListOpen] = useState(false);
+  const [errors, SetErrors] = useState({
+    titleErr: "",
+    subTasksErr: [""],
+  });
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -42,6 +46,11 @@ export default function EditTask() {
       newSubTasks[index].name = e.target.value;
       return { ...prev, subTasks: newSubTasks };
     });
+    SetErrors((prev) => {
+      const subT = [...prev.subTasksErr];
+      subT[index] = "";
+      return { ...prev, subTasksErr: subT };
+    });
   }
 
   function deleteSubTask(index) {
@@ -49,6 +58,12 @@ export default function EditTask() {
       ...prev,
       subTasks: prev.subTasks.filter((subTask, idx) => idx !== index),
     }));
+    SetErrors((prev) => {
+      return {
+        ...prev,
+        subTasksErr: prev.subTasksErr.filter((subT, idx) => idx !== index),
+      };
+    });
   }
 
   function addNewSubTask(e) {
@@ -57,6 +72,12 @@ export default function EditTask() {
       ...prev,
       subTasks: [...prev.subTasks, { name: "", isDone: false }],
     }));
+    SetErrors((prev) => {
+      return {
+        ...prev,
+        subTasksErr: [...prev.subTasksErr, ""],
+      };
+    });
   }
 
   function toggleList(e) {
@@ -96,8 +117,38 @@ export default function EditTask() {
     return subTasksWithActions;
   }
 
+  function handleTaskTitle(e) {
+    SetErrors((prev) => ({ ...prev, titleErr: "" }));
+    setTask((prev) => ({ ...prev, name: e.target.value }));
+  }
+
+  function validate() {
+    let isValid = true;
+    if (!task.name) {
+      SetErrors((prev) => ({ ...prev, titleErr: "Field can't be empty" }));
+      isValid = false;
+    }
+
+    const subTasksErr = task.subTasks.map((subTask) =>
+      subTask.name === "" ? "Field can't be empty" : ""
+    );
+    SetErrors((prev) => ({ ...prev, subTasksErr }));
+    if (subTasksErr.some((err) => err !== "")) {
+      isValid = false;
+    }
+
+    if (!task.status.name) {
+      SetErrors((prev) => ({ ...prev, statusErr: "Select task status" }));
+      isValid = false;
+    }
+    return isValid;
+  }
+
   function handleSubmit(e) {
     e.preventDefault();
+    if (!validate()) {
+      return;
+    }
     const reqTask = {
       _id: task._id,
       name: task.name,
@@ -130,14 +181,15 @@ export default function EditTask() {
               Title
             </label>
             <input
-              className="block w-full px-2 py-3 border border-gray-300 rounded-md text-sm outline-none"
+              className={`block w-full px-2 py-3 border border-gray-300 rounded-md text-sm outline-none ${
+                errors.titleErr ? "border-red-400" : ""
+              }`}
               type="text"
               placeholder="e.g. Start learning things"
               value={task.name}
-              onChange={(e) =>
-                setTask((prev) => ({ ...prev, name: e.target.value }))
-              }
+              onChange={handleTaskTitle}
             />
+            <span className="text-sm text-red-400">{errors.titleErr}</span>
           </div>
 
           <div className="mb-6">
@@ -163,21 +215,24 @@ export default function EditTask() {
               <div className="flex flex-col gap-4 max-h-[150px] overflow-auto">
                 {task.subTasks.map((subTask, index) => {
                   return (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between gap-2"
-                    >
-                      <input
-                        className="block px-2 py-3 border border-gray-300 rounded-md w-[95%] outline-none text-sm"
-                        type="text"
-                        placeholder="column name"
-                        value={subTask.name}
-                        onChange={(e) => handleSubTaskInput(e, index)}
-                      />
-                      <RxCross2
-                        onClick={() => deleteSubTask(index)}
-                        className="text-3xl w-[5%]  text-gray-500 cursor-pointer"
-                      />
+                    <div key={index}>
+                      <div className="flex items-center justify-between gap-2">
+                        <input
+                          className={`block px-2 py-3 border border-gray-300 rounded-md w-[95%] outline-none text-sm 
+                          ${errors.subTasksErr[index] ? "border-red-400" : ""}`}
+                          type="text"
+                          placeholder="column name"
+                          value={subTask.name}
+                          onChange={(e) => handleSubTaskInput(e, index)}
+                        />
+                        <RxCross2
+                          onClick={() => deleteSubTask(index)}
+                          className="text-3xl w-[5%]  text-gray-500 cursor-pointer"
+                        />
+                      </div>
+                      <span className="text-sm text-red-400">
+                        {errors.subTasksErr[index]}
+                      </span>
                     </div>
                   );
                 })}

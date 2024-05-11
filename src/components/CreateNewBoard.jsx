@@ -8,6 +8,12 @@ import { createBoard, createNewBoardReq } from "../slice/boardSlice";
 function CreateNewBoard() {
   const [boardName, SetBoardName] = useState("");
   const [columns, setColumns] = useState(["", ""]);
+  const [errors, SetErrors] = useState({
+    boardNameErr: "",
+    columnsErr: ["", ""],
+  });
+  const { boards } = useSelector((state) => state.board);
+
   const ref = useRef("");
   const dispatch = useDispatch();
   const { isCreateBoardModalVisible } = useSelector((state) => state.modal);
@@ -30,6 +36,12 @@ function CreateNewBoard() {
   function addColumnInput(e) {
     e.preventDefault();
     setColumns([...columns, ""]);
+    SetErrors((prev) => {
+      return {
+        ...prev,
+        columnsErr: [...prev.columnsErr, ""],
+      };
+    });
   }
 
   function handleColumnInput(e, index) {
@@ -38,16 +50,59 @@ function CreateNewBoard() {
       col[index] = e.target.value;
       return col;
     });
+    SetErrors((prev) => {
+      const col = [...prev.columnsErr];
+      col[index] = "";
+      return { ...prev, columnsErr: col };
+    });
   }
 
   function deleteColumnInput(index) {
     setColumns((prev) => {
       return prev.filter((column, idx) => idx !== index);
     });
+
+    SetErrors((prev) => {
+      return {
+        ...prev,
+        columnsErr: prev.columnsErr.filter((col, idx) => idx !== index),
+      };
+    });
+  }
+
+  function handleBoardName(e) {
+    SetErrors((prev) => ({ ...prev, boardNameErr: "" }));
+    SetBoardName(e.target.value);
+  }
+
+  function validate() {
+    let isValid = true;
+    if (!boardName) {
+      SetErrors((prev) => ({ ...prev, boardNameErr: "Field can't be empty" }));
+      isValid = false;
+    }
+    if (boards.map((board) => board.name).includes(boardName)) {
+      SetErrors((prev) => ({
+        ...prev,
+        boardNameErr: "Board is already present",
+      }));
+      isValid = false;
+    }
+    const columnsErr = columns.map((col) =>
+      col === "" ? "Field can't be empty" : ""
+    );
+    SetErrors((prev) => ({ ...prev, columnsErr }));
+    if (columnsErr.some((err) => err !== "")) {
+      isValid = false;
+    }
+    return isValid;
   }
 
   function handleSubmit(e) {
     e.preventDefault();
+    if (!validate()) {
+      return;
+    }
     dispatch(createBoard({ name: boardName, columns }));
     dispatch(createNewBoardReq({ name: boardName, columns }));
     dispatch(close({ modal: "createBoard" }));
@@ -67,12 +122,16 @@ function CreateNewBoard() {
               Board Name
             </label>
             <input
-              className="block w-full px-2 py-3 border border-gray-300 rounded-md text-sm outline-none"
+              className={`block w-full px-2 py-3 border border-gray-300 rounded-md text-sm outline-none ${
+                errors.boardNameErr ? "border-red-400" : ""
+              }`}
               type="text"
               placeholder="e.g. Web Development"
               value={boardName}
-              onChange={(e) => SetBoardName(e.target.value)}
+              required
+              onChange={handleBoardName}
             />
+            <span className="text-sm text-red-400">{errors.boardNameErr}</span>
           </div>
           <div>
             <label className="block text-gray-500 text-xs font-bold mb-2">
@@ -83,21 +142,24 @@ function CreateNewBoard() {
               <div className="flex flex-col gap-4 max-h-[150px] overflow-auto">
                 {columns.map((columnInput, index) => {
                   return (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between gap-2"
-                    >
-                      <input
-                        className="block px-2 py-3 border border-gray-300 rounded-md w-[95%] outline-none text-sm"
-                        type="text"
-                        placeholder="column name"
-                        value={columnInput}
-                        onChange={(e) => handleColumnInput(e, index)}
-                      />
-                      <RxCross2
-                        onClick={() => deleteColumnInput(index)}
-                        className="text-3xl w-[5%]  text-gray-500 cursor-pointer"
-                      />
+                    <div key={index}>
+                      <div className="flex items-center justify-between gap-2">
+                        <input
+                          className={`block px-2 py-3 border border-gray-300 rounded-md w-[95%] outline-none text-sm 
+                          ${errors.columnsErr[index] ? "border-red-400" : ""}`}
+                          type="text"
+                          placeholder="column name"
+                          value={columnInput}
+                          onChange={(e) => handleColumnInput(e, index)}
+                        />
+                        <RxCross2
+                          onClick={() => deleteColumnInput(index)}
+                          className="text-3xl w-[5%]  text-gray-500 cursor-pointer"
+                        />
+                      </div>
+                      <span className="text-sm text-red-400">
+                        {errors.columnsErr[index]}
+                      </span>
                     </div>
                   );
                 })}
