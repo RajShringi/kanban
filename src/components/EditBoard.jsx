@@ -22,6 +22,7 @@ export default function EditBoard() {
   });
 
   const { isEditBoardModalVisible } = useSelector((state) => state.modal);
+  const { theme } = useSelector((state) => state.theme);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -161,7 +162,12 @@ export default function EditBoard() {
 
   return ReactDom.createPortal(
     <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-black/75">
-      <div ref={ref} className="bg-white p-4 rounded-md max-w-[480px] w-full">
+      <div
+        ref={ref}
+        className={`bg-white p-4 rounded-md  w-2/6 ${
+          theme === "dark" ? "bg-[#2b2c37] text-white" : "bg-white"
+        }`}
+      >
         <h3 className="text-xl font-semibold mb-6">Edit Board</h3>
         <form>
           <div className="mb-6">
@@ -170,8 +176,12 @@ export default function EditBoard() {
             </label>
             <input
               className={`block w-full px-2 py-3 border border-gray-300 rounded-md text-sm outline-none ${
-                errors.boardNameErr ? "border-red-400" : ""
-              }`}
+                errors.boardNameErr
+                  ? "border-red-400"
+                  : theme === "dark"
+                  ? "border-[#94a3b840]"
+                  : "border-gray-300"
+              } ${theme === "dark" ? "bg-[#2b2c37] " : "bg-white "}`}
               type="text"
               placeholder="e.g. Web Development"
               value={board.name}
@@ -192,7 +202,15 @@ export default function EditBoard() {
                       <div className="flex items-center justify-between gap-2">
                         <input
                           className={`block px-2 py-3 border border-gray-300 rounded-md w-[95%] outline-none text-sm 
-                          ${errors.columnsErr[index] ? "border-red-400" : ""}`}
+                          ${
+                            errors.columnsErr[index]
+                              ? "border-red-400"
+                              : theme === "dark"
+                              ? "border-[#94a3b840]"
+                              : "border-gray-300"
+                          } ${
+                            theme === "dark" ? "bg-[#2b2c37] " : "bg-white "
+                          }`}
                           type="text"
                           placeholder="column name"
                           value={column.name}

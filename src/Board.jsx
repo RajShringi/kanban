@@ -8,6 +8,7 @@ function Board() {
   const { activeBoard } = useSelector((state) => state.board);
   const columns = activeBoard?.columns;
   const dispatch = useDispatch();
+  const { theme } = useSelector((state) => state.theme);
 
   function handleNewColumnClick() {
     dispatch(open({ modal: "editBoard" }));
@@ -42,7 +43,11 @@ function Board() {
   return (
     <div className="flex gap-4">
       <DragDropContext onDragEnd={handleDragEnd}>
-        <div className={`bg-[#e4ebfa] p-4 min-w-max flex gap-4`}>
+        <div
+          className={`p-4 min-w-max flex gap-4 ${
+            theme === "dark" ? "bg-[#20212c]" : "bg-[#e4ebfa] "
+          }`}
+        >
           {!columns
             ? ""
             : columns.map((column) => (
@@ -52,7 +57,11 @@ function Board() {
       </DragDropContext>
       <button
         onClick={handleNewColumnClick}
-        className="flex w-[280px] py-2 shrink-0 mt-9 bg-[#f1f5fc] justify-center items-center font-bold text-2xl text-gray-500 rounded-md transition-all hover:scale-90"
+        className={`flex w-[280px] py-2 shrink-0 mt-9  justify-center items-center font-bold text-2xl  rounded-md transition-all hover:scale-90 ${
+          theme === "dark"
+            ? "bg-[#2b2c3775] text-white"
+            : "bg-[#f1f5fc] text-gray-500"
+        }`}
       >
         + New Column
       </button>

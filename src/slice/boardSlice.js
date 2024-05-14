@@ -1,4 +1,3 @@
-import { arrayMove } from "@dnd-kit/sortable";
 import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
 import { GiConsoleController } from "react-icons/gi";
 

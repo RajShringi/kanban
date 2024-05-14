@@ -17,6 +17,7 @@ function CreateNewBoard() {
   const ref = useRef("");
   const dispatch = useDispatch();
   const { isCreateBoardModalVisible } = useSelector((state) => state.modal);
+  const { theme } = useSelector((state) => state.theme);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -111,10 +112,15 @@ function CreateNewBoard() {
   if (!isCreateBoardModalVisible) {
     return null;
   }
-
+  // 2b2c37
   return ReactDom.createPortal(
     <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-black/75">
-      <div ref={ref} className="bg-white p-4 rounded-md max-w-[480px] w-full">
+      <div
+        ref={ref}
+        className={`p-4 rounded-md w-2/6 ${
+          theme === "dark" ? "bg-[#2b2c37] text-white" : "bg-white "
+        }`}
+      >
         <h3 className="text-xl font-semibold mb-6">Add New Board</h3>
         <form>
           <div className="mb-6">
@@ -122,9 +128,13 @@ function CreateNewBoard() {
               Board Name
             </label>
             <input
-              className={`block w-full px-2 py-3 border border-gray-300 rounded-md text-sm outline-none ${
-                errors.boardNameErr ? "border-red-400" : ""
-              }`}
+              className={`block w-full px-2 py-3 border  rounded-md text-sm outline-none ${
+                errors.boardNameErr
+                  ? "border-red-400"
+                  : theme === "dark"
+                  ? "border-[#94a3b840]"
+                  : "border-gray-300"
+              } ${theme === "dark" ? "bg-[#2b2c37] " : "bg-white "}`}
               type="text"
               placeholder="e.g. Web Development"
               value={boardName}
@@ -145,8 +155,16 @@ function CreateNewBoard() {
                     <div key={index}>
                       <div className="flex items-center justify-between gap-2">
                         <input
-                          className={`block px-2 py-3 border border-gray-300 rounded-md w-[95%] outline-none text-sm 
-                          ${errors.columnsErr[index] ? "border-red-400" : ""}`}
+                          className={`block px-2 py-3 border rounded-md w-[95%] outline-none text-sm 
+                          ${theme === "dark" ? "bg-[#2b2c37] " : "bg-white "}
+                          ${
+                            errors.columnsErr[index]
+                              ? "border-red-400"
+                              : theme === "dark"
+                              ? "border-[#94a3b840]"
+                              : "border-gray-300"
+                          }
+                          `}
                           type="text"
                           placeholder="column name"
                           value={columnInput}

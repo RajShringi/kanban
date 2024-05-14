@@ -10,6 +10,7 @@ export default function EditTask() {
   const dispatch = useDispatch();
   const { activeBoard, selectedTask } = useSelector((state) => state.board);
   const { isEditTaskModalVisible } = useSelector((state) => state.modal);
+  const { theme } = useSelector((state) => state.theme);
   const { columnIndex, taskIndex } = selectedTask;
   const currentTask = activeBoard.columns[columnIndex].tasks[taskIndex];
   const subTasksBeforeUpdate = currentTask.subTasks;
@@ -173,7 +174,12 @@ export default function EditTask() {
 
   return ReactDom.createPortal(
     <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-black/75">
-      <div ref={ref} className="bg-white p-4 rounded-md w-2/6">
+      <div
+        ref={ref}
+        className={`p-4 rounded-md w-2/6 ${
+          theme === "dark" ? "bg-[#2b2c37] text-white" : "bg-white"
+        }`}
+      >
         <h3 className="text-xl font-semibold mb-6">Edit Task</h3>
         <form>
           <div className="mb-6">
@@ -182,8 +188,12 @@ export default function EditTask() {
             </label>
             <input
               className={`block w-full px-2 py-3 border border-gray-300 rounded-md text-sm outline-none ${
-                errors.titleErr ? "border-red-400" : ""
-              }`}
+                errors.titleErr
+                  ? "border-red-400"
+                  : theme === "dark"
+                  ? "border-[#94a3b840]"
+                  : "border-gray-300"
+              } ${theme === "dark" ? "bg-[#2b2c37] " : "bg-white "}`}
               type="text"
               placeholder="e.g. Start learning things"
               value={task.name}
@@ -197,7 +207,12 @@ export default function EditTask() {
               Description(optional)
             </label>
             <textarea
-              className="block w-full px-2 py-3 border border-gray-300 rounded-md text-sm outline-none resize-none"
+              className={`block w-full px-2 py-3 border rounded-md text-sm outline-none resize-none
+              ${
+                theme === "dark"
+                  ? "bg-[#2b2c37] border-[#94a3b840]"
+                  : "border-gray-300 bg-white"
+              }`}
               placeholder="e.g. Start learning things"
               value={task.description}
               onChange={(e) =>
@@ -219,7 +234,15 @@ export default function EditTask() {
                       <div className="flex items-center justify-between gap-2">
                         <input
                           className={`block px-2 py-3 border border-gray-300 rounded-md w-[95%] outline-none text-sm 
-                          ${errors.subTasksErr[index] ? "border-red-400" : ""}`}
+                          ${
+                            errors.subTasksErr[index]
+                              ? "border-red-400"
+                              : theme === "dark"
+                              ? "border-[#94a3b840]"
+                              : "border-gray-300"
+                          } ${
+                            theme === "dark" ? "bg-[#2b2c37] " : "bg-white "
+                          }`}
                           type="text"
                           placeholder="column name"
                           value={subTask.name}
@@ -251,13 +274,19 @@ export default function EditTask() {
               Status
             </label>
             <button
-              className="block px-2 py-3 border border-gray-300 rounded-md w-full text-left text-sm"
+              className={`block px-2 py-3 border rounded-md w-full text-left text-sm ${
+                theme === "dark" ? "border-[#94a3b840]" : "border-gray-300"
+              }`}
               onClick={toggleList}
             >
               {task.status === "" ? "Select a status" : task.status.name}
             </button>
             {isListOpen && (
-              <ul className="absolute top-20 bg-white left-0 right-0 shadow-md rounded-md p-2">
+              <ul
+                className={`absolute top-20 bg-white left-0 right-0 shadow-md rounded-md p-2  ${
+                  theme === "dark" ? "bg-[#2b2c37]" : "bg-white "
+                }`}
+              >
                 {activeBoard.columns.map((column, index) => {
                   return (
                     <li
@@ -265,7 +294,11 @@ export default function EditTask() {
                         selectStatus({ _id: column._id, name: column.name })
                       }
                       key={column._id}
-                      className="text-gray-400 hover:text-gray-800 cursor-pointer text-sm py-1"
+                      className={`text-gray-400 cursor-pointer text-sm py-1 ${
+                        theme === "dark"
+                          ? "hover:text-white"
+                          : "hover:text-gray-800"
+                      }`}
                     >
                       {column.name}
                     </li>

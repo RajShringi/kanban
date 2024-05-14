@@ -7,10 +7,17 @@ import Slider from "./Slider";
 import { useDispatch, useSelector } from "react-redux";
 import { open } from "./slice/modalSlice";
 import { fetchColumns, selectBoard } from "./slice/boardSlice";
-
+// 3e3f4e
 function Sidebar({ setIsSidebarHidden }) {
+  const { theme } = useSelector((state) => state.theme);
   return (
-    <div className="bg-white min-h-full border-r border-[#e4ebfa] flex flex-col pt-4 pb-8 justify-between">
+    <div
+      className={`min-h-full border-r  flex flex-col pt-4 pb-8 justify-between ${
+        theme === "dark"
+          ? "bg-[#2b2c37] border-[#2b2c37]"
+          : "bg-white border-[#e4ebfa] "
+      }`}
+    >
       <div className="space-y-4">
         <h4 className="uppercase text-gray-500 px-6 font-semibold text-sm tracking-widest">
           All Board (3)
@@ -19,7 +26,11 @@ function Sidebar({ setIsSidebarHidden }) {
       </div>
 
       <div>
-        <div className="flex items-center justify-center p-4 rounded-md space-x-4 mx-6 bg-[#f4f7fd]">
+        <div
+          className={`flex items-center justify-center p-4 rounded-md space-x-4 mx-6 ${
+            theme === "dark" ? "bg-[#20212c]" : "bg-[#f4f7fd]"
+          }`}
+        >
           <IoSunny className="text-xl text-gray-400" />
           <Slider />
           <RiMoonClearFill className="text-xl text-gray-400" />
@@ -39,6 +50,7 @@ export default Sidebar;
 
 function AllBoards() {
   const dispatch = useDispatch();
+  const { theme } = useSelector((state) => state.theme);
   const { boards, activeBoard } = useSelector((state) => state.board);
 
   function createBoard() {
@@ -60,6 +72,8 @@ function AllBoards() {
             className={`${
               activeBoard._id === board._id
                 ? "bg-[#635fc7] text-white"
+                : theme === "dark"
+                ? "text-gray-400 hover:bg-[white] hover:text-[#635fc7]"
                 : "text-gray-400 hover:bg-[#625fc71e] hover:text-[#635fc7]"
             } flex items-center space-x-4 cursor-pointer py-4 pl-6 w-[90%] rounded-r-full`}
             onClick={() => handleClickBoard(board)}

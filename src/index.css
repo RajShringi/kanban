@@ -6,13 +6,21 @@
   appearance: none;
 }
 
+:root {
+  --scrollbar-bg: white;
+}
+
+[data-theme="dark"] {
+  --scrollbar-bg: #2b2c37;
+}
+
 ::-webkit-scrollbar {
   width: 0.75rem;
   /* height: 0.75rem; width of the entire scrollbar */
 }
 
 ::-webkit-scrollbar-track {
-  background: white; /* color of the tracking area */
+  background: var(--scrollbar-bg); /* color of the tracking area */
 }
 
 ::-webkit-scrollbar-thumb {

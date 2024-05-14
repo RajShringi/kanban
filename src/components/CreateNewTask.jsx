@@ -23,6 +23,7 @@ export default function CreateNewTask() {
   const dispatch = useDispatch();
   const { iscreateTaskModalVisible } = useSelector((state) => state.modal);
   const { activeBoard } = useSelector((state) => state.board);
+  const { theme } = useSelector((state) => state.theme);
   const { user } = useSelector((state) => state.user);
   const ref = useRef(null);
 
@@ -145,7 +146,12 @@ export default function CreateNewTask() {
 
   return ReactDom.createPortal(
     <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-black/75">
-      <div ref={ref} className="bg-white p-4 rounded-md  w-2/6">
+      <div
+        ref={ref}
+        className={`p-4 rounded-md  w-2/6 ${
+          theme === "dark" ? "bg-[#2b2c37] text-white" : "bg-white"
+        }`}
+      >
         <h3 className="text-xl font-semibold mb-6">Add New Task</h3>
         <form>
           <div className="mb-6">
@@ -154,8 +160,12 @@ export default function CreateNewTask() {
             </label>
             <input
               className={`block w-full px-2 py-3 border border-gray-300 rounded-md text-sm outline-none ${
-                errors.titleErr ? "border-red-400" : ""
-              }`}
+                errors.titleErr
+                  ? "border-red-400"
+                  : theme === "dark"
+                  ? "border-[#94a3b840]"
+                  : "border-gray-300"
+              } ${theme === "dark" ? "bg-[#2b2c37] " : "bg-white "}`}
               type="text"
               placeholder="e.g. Start learning things"
               value={task.title}
@@ -169,7 +179,11 @@ export default function CreateNewTask() {
               Description(optional)
             </label>
             <textarea
-              className="block w-full px-2 py-3 border border-gray-300 rounded-md text-sm outline-none resize-none"
+              className={`block w-full px-2 py-3 border rounded-md text-sm outline-none resize-none ${
+                theme === "dark"
+                  ? "bg-[#2b2c37] border-[#94a3b840]"
+                  : "border-gray-300 bg-white"
+              }`}
               placeholder="e.g. Start learning things"
               value={task.description}
               onChange={(e) =>
@@ -191,8 +205,13 @@ export default function CreateNewTask() {
                       <div className="flex items-center justify-between gap-2">
                         <input
                           className={`block px-2 py-3 border border-gray-300 rounded-md w-[95%] outline-none text-sm 
+                          ${theme === "dark" ? "bg-[#2b2c37] " : "bg-white "}
                            ${
-                             errors.subTasksErr[index] ? "border-red-400" : ""
+                             errors.subTasksErr[index]
+                               ? "border-red-400"
+                               : theme === "dark"
+                               ? "border-[#94a3b840]"
+                               : "border-gray-300"
                            }`}
                           type="text"
                           placeholder="column name"
@@ -226,7 +245,11 @@ export default function CreateNewTask() {
             </label>
             <button
               className={`block px-2 py-3 border border-gray-300 rounded-md w-full text-left text-sm ${
-                errors.statusErr ? "border-red-400" : ""
+                errors.statusErr
+                  ? "border-red-400"
+                  : theme === "dark"
+                  ? "border-[#94a3b840]"
+                  : "border-gray-300"
               }`}
               onClick={toggleList}
             >
@@ -235,7 +258,11 @@ export default function CreateNewTask() {
             <span className="text-sm text-red-400">{errors.statusErr}</span>
 
             {isListOpen && (
-              <ul className="absolute top-20 bg-white left-0 right-0 shadow-md rounded-md p-2">
+              <ul
+                className={`absolute top-20 left-0 right-0 shadow-md rounded-md p-2 ${
+                  theme === "dark" ? "bg-[#2b2c37]" : "bg-white "
+                }`}
+              >
                 {activeBoard.columns.map((column, index) => {
                   return (
                     <li
@@ -243,7 +270,11 @@ export default function CreateNewTask() {
                         selectStatus({ _id: column._id, name: column.name })
                       }
                       key={column._id}
-                      className="text-gray-400 hover:text-gray-800 cursor-pointer text-sm py-1"
+                      className={`text-gray-400 cursor-pointer text-sm py-1 ${
+                        theme === "dark"
+                          ? "hover:text-white"
+                          : "hover:text-gray-800"
+                      }`}
                     >
                       {column.name}
                     </li>

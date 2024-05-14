@@ -1,5 +1,6 @@
 import { MdOutlineMoreVert } from "react-icons/md";
 import kanbanLightImage from "./assets/kanban-light-logo.svg";
+import kanbanDarkImage from "./assets/kanban-dark-logo.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { close, open } from "./slice/modalSlice";
 import { useEffect, useRef } from "react";
@@ -16,6 +17,7 @@ function Header() {
   const dispatch = useDispatch();
   // <DeleteCode>
   const { user } = useSelector((state) => state.user);
+  const { theme } = useSelector((state) => state.theme);
   const { activeBoard } = useSelector((state) => state.board);
   useEffect(() => {
     if (user) {
@@ -38,15 +40,27 @@ function Header() {
   //Delete this code </DeleteCode>
 
   return (
-    <div className="bg-white flex  header">
-      <div className="flex-[20%] max-w-[300px] flex items-center px-6  border-r border-r-[#e4ebfa]">
-        <img src={kanbanLightImage} alt="kanban-logo" />
+    <div
+      className={`flex  header ${
+        theme === "dark" ? "bg-[#2b2c37]" : "bg-white "
+      }`}
+    >
+      <div
+        className={`flex-[20%] max-w-[300px] flex items-center px-6  border-r ${
+          theme === "dark" ? "border-r-[#2b2c37]" : "border-r-[#e4ebfa]"
+        }`}
+      >
+        {theme === "dark" ? (
+          <img src={kanbanDarkImage} alt="kanban-dark-logo" />
+        ) : (
+          <img src={kanbanLightImage} alt="kanban-logo" />
+        )}
       </div>
       <div className="flex-[80%] flex justify-between items-center px-4 py-6">
         <h2 className="font-bold text-2xl">Platform Launch</h2>
         <div className="space-x-4 flex items-center relative">
           <button
-            className="px-6 py-3 rounded-full bg-indigo-500 text-white"
+            className="px-6 py-3 rounded-full bg-[#635fc7] text-white"
             onClick={fakeUserLogin}
           >
             {user ? user.name : "fake user"}
@@ -73,7 +87,9 @@ function HeaderTooltip() {
   const dispatch = useDispatch();
   const ref = useRef(null);
   const { activeBoard, boards } = useSelector((state) => state.board);
-
+  const { theme } = useSelector((state) => state.theme);
+  const { user } = useSelector((state) => state.user);
+  console.log({ user }, "user");
   useEffect(() => {
     const handleOutsideClick = (e) => {
       if (ref.current && !ref.current.contains(e.target)) {
@@ -112,25 +128,40 @@ function HeaderTooltip() {
   return (
     <div
       ref={ref}
-      className="absolute flex flex-col gap-4 p-4 bg-white rounded-md w-[150px] 2xl:w-[200px] shadow-md top-20 right-0"
+      className={`absolute flex flex-col gap-4 p-4 rounded-md w-[150px] 2xl:w-[200px] shadow-md top-20 right-0 z-10 ${
+        theme === "dark" ? "bg-[#2b2c37]" : "bg-white"
+      }`}
     >
+      <p
+        className={`block text-left text-sm text-gray-400 ${
+          theme === "dark" ? "hover:text-white" : "hover:text-gray-700"
+        }`}
+      >
+        {user.name}
+      </p>
       <button
         onClick={editBoard}
-        className={`block text-left text-sm text-gray-400 hover:text-gray-700 disabled:cursor-not-allowed`}
+        className={`block text-left text-sm text-gray-400 disabled:cursor-not-allowed ${
+          theme === "dark" ? "hover:text-white" : "hover:text-gray-700"
+        }`}
         disabled={Object.keys(activeBoard).length === 0}
       >
         Edit Board
       </button>
       {/* all board column are deleted clear board button functionality */}
-      <button
-        className="block text-left text-sm text-gray-400 hover:text-gray-700 disabled:cursor-not-allowed"
+      {/* <button
+        className={`block text-left text-sm text-gray-400 disabled:cursor-not-allowed ${
+          theme === "dark" ? "hover:text-white" : "hover:text-gray-700"
+        }`}
         disabled={Object.keys(activeBoard).length === 0}
       >
         Clear Board
-      </button>
+      </button> */}
       <button
         onClick={handleDeleteBoard}
-        className="block text-left text-sm text-red-400 hover:text-red-600 disabled:cursor-not-allowed"
+        className={`block text-left text-sm text-red-400  disabled:cursor-not-allowed ${
+          theme === "dark" ? "hover:text-red-300" : "hover:text-red-600"
+        }`}
         disabled={Object.keys(activeBoard).length === 0}
       >
         Delete Board

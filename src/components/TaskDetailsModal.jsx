@@ -15,6 +15,7 @@ import { MdOutlineMoreVert } from "react-icons/md";
 export default function TaskDetailsModal() {
   const { activeBoard, selectedTask } = useSelector((state) => state.board);
   const { isTaskDetailsVisible } = useSelector((state) => state.modal);
+  const { theme } = useSelector((state) => state.theme);
   const ref = useRef("");
   const taskActionRef = useRef("");
   const dispatch = useDispatch();
@@ -92,7 +93,9 @@ export default function TaskDetailsModal() {
     <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-black/75">
       <div
         ref={ref}
-        className="bg-white p-4 rounded-md w-2/6 flex flex-col gap-4"
+        className={`p-4 rounded-md w-2/6 flex flex-col gap-4 ${
+          theme === "dark" ? "bg-[#2b2c37] text-white" : "bg-white "
+        }`}
       >
         <div className="flex items-center justify-between relative">
           <h3 className="text-xl font-semibold">{task.name}</h3>
@@ -103,17 +106,23 @@ export default function TaskDetailsModal() {
           {isTaskActionsVisible && (
             <div
               ref={taskActionRef}
-              className="absolute flex flex-col gap-1 items-start w-[120px] bg-white rounded-md shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] -right-10 top-10"
+              className={`absolute flex flex-col gap-1 items-start w-[120px] rounded-md shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] -right-10 top-10 ${
+                theme === "dark" ? "bg-[#2b2c37]" : "bg-white"
+              }`}
             >
               <button
                 onClick={handleEditTaskButton}
-                className="block text-sm text-gray-400 p-2 hover:text-gray-700"
+                className={`block text-sm text-gray-400 p-2 ${
+                  theme === "dark" ? "hover:text-white" : "hover:text-gray-700"
+                }`}
               >
                 Edit Task
               </button>
               <button
                 onClick={deleteTask}
-                className="block text-sm text-red-400 hover:text-red-600 p-2"
+                className={`block text-sm text-red-400  p-2 ${
+                  theme === "dark" ? "hover:text-red-300" : "hover:text-red-600"
+                }`}
               >
                 Delete Task
               </button>
@@ -130,7 +139,9 @@ export default function TaskDetailsModal() {
               return (
                 <li
                   key={subTask._id}
-                  className="flex gap-4 bg-[#f4f7fd] px-4 py-2 rounded-md"
+                  className={`flex gap-4 px-4 py-2 rounded-md ${
+                    theme === "dark" ? "bg-[#20212c]" : "bg-[#f4f7fd]"
+                  }`}
                 >
                   <input
                     type="checkbox"
@@ -158,18 +169,28 @@ export default function TaskDetailsModal() {
           </label>
           <button
             onClick={() => setIsListOpen(!isListOpen)}
-            className="block px-2 py-3 border border-gray-300 rounded-md w-full text-left text-sm"
+            className={`block px-2 py-3 border  rounded-md w-full text-left text-sm ${
+              theme === "dark" ? "border-[#94a3b840]" : "border-gray-300"
+            }`}
           >
             {activeBoard.columns[selectedTask.columnIndex].name}
           </button>
           {isListOpen && (
-            <ul className="absolute top-20 bg-white left-0 right-0 shadow-md rounded-md p-2">
+            <ul
+              className={`absolute top-20 left-0 right-0 shadow-md rounded-md p-2 ${
+                theme === "dark" ? "bg-[#2b2c37]" : "bg-white "
+              }`}
+            >
               {activeBoard.columns.map((column, index) => {
                 return (
                   <li
                     onClick={() => changeStatus(column._id)}
                     key={column._id}
-                    className="text-gray-400 hover:text-gray-800 cursor-pointer text-sm py-1"
+                    className={`text-gray-400 cursor-pointer text-sm py-1 ${
+                      theme === "dark"
+                        ? "hover:text-white"
+                        : "hover:text-gray-800 "
+                    }`}
                   >
                     {column.name}
                   </li>
