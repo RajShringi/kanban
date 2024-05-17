@@ -4,11 +4,11 @@ import kanbanDarkImage from "../assets/kanban-dark-logo.svg";
 import { useSelector } from "react-redux";
 import { Link, Navigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { userRegister } from "../slice/userSlice";
+import { resetError, userRegister } from "../slice/userSlice";
 
 export default function Register() {
   const { theme } = useSelector((state) => state.theme);
-  const { user } = useSelector((state) => state.user);
+  const { user, errMsg } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [userInfo, setUserInfo] = useState({
     username: "",
@@ -22,6 +22,7 @@ export default function Register() {
   });
 
   function handleChange(e) {
+    dispatch(resetError());
     const { name, value } = e.target;
     setUserInfo((prev) => {
       return { ...prev, [name]: value };
@@ -76,7 +77,6 @@ export default function Register() {
     if (result.meta.requestStatus === "fulfilled") {
       <Navigate to="/" />;
     }
-    console.log("user is valid");
   }
 
   if (user) {
@@ -114,7 +114,7 @@ export default function Register() {
             <input
               className={`block w-full px-2 py-3 border  rounded-md text-sm outline-none 
               ${
-                errors.usernameErr
+                errors.usernameErr || errMsg.username
                   ? "border-red-400"
                   : theme === "dark"
                   ? "border-[#94a3b840]"
@@ -128,14 +128,16 @@ export default function Register() {
               required
               onChange={handleChange}
             />
-            <span className="text-sm text-red-400">{errors.usernameErr}</span>
+            <span className="text-sm text-red-400">
+              {errors.usernameErr || errMsg.username}
+            </span>
           </div>
 
           <div className="mb-6">
             <input
               className={`block w-full px-2 py-3 border  rounded-md text-sm outline-none 
               ${
-                errors.emailErr
+                errors.emailErr || errMsg.email
                   ? "border-red-400"
                   : theme === "dark"
                   ? "border-[#94a3b840]"
@@ -150,7 +152,9 @@ export default function Register() {
               required
               onChange={handleChange}
             />
-            <span className="text-sm text-red-400">{errors.emailErr}</span>
+            <span className="text-sm text-red-400">
+              {errors.emailErr || errMsg.email}
+            </span>
           </div>
 
           <div className="mb-6">

@@ -4,11 +4,11 @@ import kanbanLightImage from "../assets/kanban-light-logo.svg";
 import kanbanDarkImage from "../assets/kanban-dark-logo.svg";
 import { Link, Navigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { userLogin } from "../slice/userSlice";
+import { resetError, userLogin } from "../slice/userSlice";
 
 export default function Login() {
   const { theme } = useSelector((state) => state.theme);
-  const { user } = useSelector((state) => state.user);
+  const { user, errMsg } = useSelector((state) => state.user);
   const { boards } = useSelector((state) => state.board);
   const [userInfo, setUserInfo] = useState({
     email: "",
@@ -54,6 +54,7 @@ export default function Login() {
   }
 
   function handleChange(e) {
+    dispatch(resetError());
     const { name, value } = e.target;
     setUserInfo((prev) => {
       return { ...prev, [name]: value };
@@ -65,6 +66,15 @@ export default function Login() {
     // if (!validate()) {
     //   console.log(errors);
     //   console.log(userInfo);
+    //   return;
+    // }
+    // if (Object.keys(errMsg).length !== 0) {
+    //   if (errMsg.email) {
+    //     SetErrors((prev) => ({ ...prev, emailErr: `Email is not found` }));
+    //   }
+    //   if (errMsg.password) {
+    //     SetErrors((prev) => ({ ...prev, emailErr: `Password is incorrect` }));
+    //   }
     //   return;
     // }
     const result = await dispatch(userLogin(userInfo));
@@ -107,7 +117,7 @@ export default function Login() {
             <input
               className={`block w-full px-2 py-3 border  rounded-md text-sm outline-none 
               ${
-                errors.emailErr
+                errors.emailErr || errMsg.email
                   ? "border-red-400"
                   : theme === "dark"
                   ? "border-[#94a3b840]"
@@ -121,14 +131,16 @@ export default function Login() {
               required
               onChange={handleChange}
             />
-            <span className="text-sm text-red-400">{errors.emailErr}</span>
+            <span className="text-sm text-red-400">
+              {errors.emailErr || errMsg.email}
+            </span>
           </div>
 
           <div className="mb-6">
             <input
               className={`block w-full px-2 py-3 border  rounded-md text-sm outline-none
               ${
-                errors.passwordErr
+                errors.passwordErr || errMsg.password
                   ? "border-red-400"
                   : theme === "dark"
                   ? "border-[#94a3b840]"
@@ -142,7 +154,9 @@ export default function Login() {
               required
               onChange={handleChange}
             />
-            <span className="text-sm text-red-400">{errors.passwordErr}</span>
+            <span className="text-sm text-red-400">
+              {errors.passwordErr || errMsg.password}
+            </span>
           </div>
 
           <button

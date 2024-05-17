@@ -4,6 +4,7 @@ const initialState = {
   user: null,
   loading: false,
   error: false,
+  errMsg: {},
 };
 
 const user = JSON.parse(localStorage.getItem("user")) || "";
@@ -13,7 +14,7 @@ if (user) {
 
 export const userRegister = createAsyncThunk(
   "user/userRegister",
-  async (userInfo) => {
+  async (userInfo, { rejectWithValue }) => {
     try {
       const res = await fetch("http://localhost:3000/api/signup", {
         method: "POST",
@@ -25,20 +26,20 @@ export const userRegister = createAsyncThunk(
         }),
       });
       if (!res.ok) {
-        console.log("response is not okay while fetching user");
-        return;
+        const json = await res.json();
+        return rejectWithValue(json.errMsg);
       }
       const json = await res.json();
       return json;
     } catch (error) {
-      return error;
+      return rejectWithValue(error.errMsg);
     }
   }
 );
 
 export const userLogin = createAsyncThunk(
   "user/userLogin",
-  async (userInfo) => {
+  async (userInfo, { rejectWithValue }) => {
     try {
       const res = await fetch("http://localhost:3000/api/login", {
         method: "POST",
@@ -51,7 +52,8 @@ export const userLogin = createAsyncThunk(
       });
       if (!res.ok) {
         console.log("response is not okay while fetching user");
-        return;
+        const json = await res.json();
+        return rejectWithValue(json.errMsg);
       }
       const json = await res.json();
       return json;
@@ -82,18 +84,43 @@ export const userSlice = createSlice({
       state.user = action.payload;
       localStorage.setItem("user", JSON.stringify(action.payload));
     },
+    resetError: (state, action) => {
+      state.errMsg = {};
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(userLogin.fulfilled, (state, action) => {
       state.user = action.payload;
+      state.errMsg = {};
       localStorage.setItem("user", JSON.stringify(action.payload));
+    });
+    builder.addCase(userLogin.rejected, (state, action) => {
+      state.errMsg = {};
+      if (action.payload === "password is incorrect") {
+        state.errMsg.password = "password is incorrect";
+      }
+      if (action.payload === "User not found") {
+        state.errMsg.email = "Email is not found";
+      }
+      state.errMsg.err = action.payload;
     });
     builder.addCase(userRegister.fulfilled, (state, action) => {
       state.user = action.payload;
+      state.errMsg = {};
       localStorage.setItem("user", JSON.stringify(action.payload));
+    });
+    builder.addCase(userRegister.rejected, (state, action) => {
+      state.errMsg = {};
+      if (action.payload === "User with this email already exist") {
+        state.errMsg.email = "User with this email already exist";
+      }
+      if (action.payload === "User with this username already exist") {
+        state.errMsg.username = "User with this username already exist";
+      }
+      state.errMsg.err = action.payload;
     });
   },
 });
 
-export const { login, logout, singup } = userSlice.actions;
+export const { login, logout, singup, resetError } = userSlice.actions;
 export default userSlice.reducer;
