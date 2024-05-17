@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TbLayoutBoardSplit } from "react-icons/tb";
 import { IoSunny } from "react-icons/io5";
 import { RiMoonClearFill } from "react-icons/ri";
@@ -7,7 +7,7 @@ import Slider from "./Slider";
 import { useDispatch, useSelector } from "react-redux";
 import { open } from "./slice/modalSlice";
 import { fetchColumns, selectBoard } from "./slice/boardSlice";
-// 3e3f4e
+
 function Sidebar({ setIsSidebarHidden }) {
   const { theme } = useSelector((state) => state.theme);
   return (
@@ -52,13 +52,13 @@ function AllBoards() {
   const dispatch = useDispatch();
   const { theme } = useSelector((state) => state.theme);
   const { boards, activeBoard } = useSelector((state) => state.board);
+  const { user } = useSelector((state) => state.user);
 
   function createBoard() {
     dispatch(open({ modal: "createBoard" }));
   }
 
   function handleClickBoard(board) {
-    console.log(board, "sidebar");
     dispatch(selectBoard(board));
     dispatch(fetchColumns(board.columns));
   }

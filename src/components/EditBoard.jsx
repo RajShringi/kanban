@@ -84,7 +84,6 @@ export default function EditBoard() {
   function columnsActions() {
     let addUpdateActions = board.columns
       .map((column) => {
-        console.log({ column });
         if (!Object.hasOwn(column, "_id")) {
           return { name: column.name, action: "add" };
         }
@@ -105,7 +104,6 @@ export default function EditBoard() {
       })
       .filter(Boolean);
     const columnsWithActions = [...addUpdateActions, ...deletedColumns];
-    console.log(columnsWithActions, "columnsActions");
     return columnsWithActions;
   }
 
@@ -164,7 +162,7 @@ export default function EditBoard() {
     <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-black/75">
       <div
         ref={ref}
-        className={`bg-white p-4 rounded-md  w-2/6 ${
+        className={`p-4 rounded-md  w-2/6 ${
           theme === "dark" ? "bg-[#2b2c37] text-white" : "bg-white"
         }`}
       >
@@ -175,7 +173,7 @@ export default function EditBoard() {
               Board Name
             </label>
             <input
-              className={`block w-full px-2 py-3 border border-gray-300 rounded-md text-sm outline-none ${
+              className={`block w-full px-2 py-3 border rounded-md text-sm outline-none ${
                 errors.boardNameErr
                   ? "border-red-400"
                   : theme === "dark"
@@ -201,7 +199,7 @@ export default function EditBoard() {
                     <div key={index}>
                       <div className="flex items-center justify-between gap-2">
                         <input
-                          className={`block px-2 py-3 border border-gray-300 rounded-md w-[95%] outline-none text-sm 
+                          className={`block px-2 py-3 border rounded-md w-[95%] outline-none text-sm 
                           ${
                             errors.columnsErr[index]
                               ? "border-red-400"

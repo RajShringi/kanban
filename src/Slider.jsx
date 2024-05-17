@@ -5,7 +5,6 @@ import { changeTheme } from "./slice/themeSlice";
 function Slider() {
   const { theme } = useSelector((state) => state.theme);
   const dispatch = useDispatch();
-  console.log({ theme }, "sider");
   function handleToggle(e) {
     dispatch(changeTheme(theme === "dark" ? "light" : "dark"));
   }

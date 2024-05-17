@@ -1,43 +1,52 @@
-import { MdOutlineMoreVert } from "react-icons/md";
+import { MdOutlineDeleteOutline, MdOutlineMoreVert } from "react-icons/md";
 import kanbanLightImage from "./assets/kanban-light-logo.svg";
 import kanbanDarkImage from "./assets/kanban-dark-logo.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { close, open } from "./slice/modalSlice";
 import { useEffect, useRef } from "react";
-import { fetchUser } from "./slice/userSlice";
+import { logout, userLogin } from "./slice/userSlice";
 import {
+  boardLogout,
   deleteBoard,
   deleteBoardReq,
   fetchBoards,
   fetchColumns,
   selectBoard,
 } from "./slice/boardSlice";
+import { FiEdit2, FiUser } from "react-icons/fi";
+import { TbLogout2 } from "react-icons/tb";
 
 function Header() {
   const dispatch = useDispatch();
-  // <DeleteCode>
-  const { user } = useSelector((state) => state.user);
   const { theme } = useSelector((state) => state.theme);
+  const { user } = useSelector((state) => state.user);
   const { activeBoard } = useSelector((state) => state.board);
-  useEffect(() => {
-    if (user) {
-      dispatch(fetchBoards());
-    }
-  }, [user]);
-  // </DeleteCode>
   const openHeaderTooltip = () => {
     dispatch(open({ tooltip: "header" }));
   };
 
+  useEffect(() => {
+    async function fetchUserBoards() {
+      if (user) {
+        const result = await dispatch(fetchBoards());
+        if (result.meta.requestStatus === "fulfilled") {
+          console.log(result, "header");
+          const boards = result?.payload?.boards;
+          const board = JSON.parse(localStorage.getItem("board"));
+          if (boards.length > 0 && !board) {
+            localStorage.setItem("board", JSON.stringify(boards[0]));
+            dispatch(selectBoard(boards[0]));
+            dispatch(fetchColumns(boards[0].columns));
+          }
+        }
+      }
+    }
+    fetchUserBoards();
+  }, []);
+
   const createTask = () => {
     dispatch(open({ modal: "createTask" }));
   };
-
-  // Delete this code <DeleteCode>
-  const fakeUserLogin = () => {
-    dispatch(fetchUser());
-  };
-  //Delete this code </DeleteCode>
 
   return (
     <div
@@ -59,12 +68,6 @@ function Header() {
       <div className="flex-[80%] flex justify-between items-center px-4 py-6">
         <h2 className="font-bold text-2xl">Platform Launch</h2>
         <div className="space-x-4 flex items-center relative">
-          <button
-            className="px-6 py-3 rounded-full bg-[#635fc7] text-white"
-            onClick={fakeUserLogin}
-          >
-            {user ? user.name : "fake user"}
-          </button>
           <button
             className="bg-[#635fc7] hover:bg-[#635fc8c9] text-white px-6 py-3 rounded-full font-bold disabled:cursor-not-allowed"
             onClick={createTask}
@@ -89,7 +92,6 @@ function HeaderTooltip() {
   const { activeBoard, boards } = useSelector((state) => state.board);
   const { theme } = useSelector((state) => state.theme);
   const { user } = useSelector((state) => state.user);
-  console.log({ user }, "user");
   useEffect(() => {
     const handleOutsideClick = (e) => {
       if (ref.current && !ref.current.contains(e.target)) {
@@ -121,6 +123,12 @@ function HeaderTooltip() {
     dispatch(close({ tooltip: "header" }));
   }
 
+  function handleLogout() {
+    dispatch(logout());
+    dispatch(boardLogout());
+    dispatch(close({ tooltip: "header" }));
+  }
+
   if (!isHeaderTooltipVisible) {
     return null;
   }
@@ -133,20 +141,26 @@ function HeaderTooltip() {
       }`}
     >
       <p
-        className={`block text-left text-sm text-gray-400 ${
+        className={`text-left text-sm text-gray-400 flex gap-2 items-center ${
           theme === "dark" ? "hover:text-white" : "hover:text-gray-700"
         }`}
       >
-        {user.name}
+        <span>
+          <FiUser className="text-xl" />
+        </span>
+        <span>{user.name}</span>
       </p>
       <button
         onClick={editBoard}
-        className={`block text-left text-sm text-gray-400 disabled:cursor-not-allowed ${
+        className={`flex text-left text-sm text-gray-400 disabled:cursor-not-allowed gap-2 ${
           theme === "dark" ? "hover:text-white" : "hover:text-gray-700"
         }`}
         disabled={Object.keys(activeBoard).length === 0}
       >
-        Edit Board
+        <span>
+          <FiEdit2 className="text-lg" />
+        </span>
+        <span>Edit Board</span>
       </button>
       {/* all board column are deleted clear board button functionality */}
       {/* <button
@@ -157,14 +171,28 @@ function HeaderTooltip() {
       >
         Clear Board
       </button> */}
+
       <button
         onClick={handleDeleteBoard}
-        className={`block text-left text-sm text-red-400  disabled:cursor-not-allowed ${
+        className={`flex gap-2 text-left text-sm text-red-400  disabled:cursor-not-allowed ${
           theme === "dark" ? "hover:text-red-300" : "hover:text-red-600"
         }`}
         disabled={Object.keys(activeBoard).length === 0}
       >
-        Delete Board
+        <span>
+          <MdOutlineDeleteOutline className="text-xl" />
+        </span>
+        <span>Delete Board</span>
+      </button>
+
+      <button
+        onClick={handleLogout}
+        className={`flex gap-2 text-left text-sm text-[#635fc7]  disabled:cursor-not-allowed hover:text-[#635fc8c9]`}
+      >
+        <span>
+          <TbLogout2 className="text-xl" />
+        </span>
+        <span>log out</span>
       </button>
     </div>
   );

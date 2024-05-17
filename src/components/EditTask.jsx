@@ -114,7 +114,7 @@ export default function EditTask() {
       })
       .filter(Boolean);
     const subTasksWithActions = [...addUpdateActions, ...deletedSubTasks];
-    console.log(subTasksWithActions, "subTaskwithactions");
+
     return subTasksWithActions;
   }
 
@@ -187,7 +187,7 @@ export default function EditTask() {
               Title
             </label>
             <input
-              className={`block w-full px-2 py-3 border border-gray-300 rounded-md text-sm outline-none ${
+              className={`block w-full px-2 py-3 border rounded-md text-sm outline-none ${
                 errors.titleErr
                   ? "border-red-400"
                   : theme === "dark"
@@ -233,7 +233,7 @@ export default function EditTask() {
                     <div key={index}>
                       <div className="flex items-center justify-between gap-2">
                         <input
-                          className={`block px-2 py-3 border border-gray-300 rounded-md w-[95%] outline-none text-sm 
+                          className={`block px-2 py-3 border rounded-md w-[95%] outline-none text-sm 
                           ${
                             errors.subTasksErr[index]
                               ? "border-red-400"

@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
-import { GiConsoleController } from "react-icons/gi";
 
 const initialState = {
   boards: [],
@@ -27,12 +26,11 @@ export const fetchBoards = createAsyncThunk(
 
 export const fetchColumns = createAsyncThunk(
   "board/fetchColumns",
-  async (columns, { getState }) => {
-    console.log("fetch column called");
+  async (columns, { getState, rejectWithValue }) => {
+    console.log({ columns }, "fetchcolums req");
     try {
       const state = getState();
       const token = state.user.user.token;
-      console.log({ columns }, "columns");
       if (!columns) {
         return;
       }
@@ -44,12 +42,16 @@ export const fetchColumns = createAsyncThunk(
             headers: { authorization: `Token ${token}` },
           }
         );
+        if (!res.ok) {
+          throw new Error("No column found with this ${columnId}");
+        }
         const json = await res.json();
         return json;
       });
       const result = await Promise.all(promise);
       return result;
     } catch (error) {
+      return rejectWithValue(error);
       return error;
     }
   }
@@ -72,7 +74,6 @@ export const postNewTask = createAsyncThunk(
         }),
       });
       const json = await res.json();
-      console.log({ json }, "postNewTask");
       return { task: json.task, reduxTaskId: taskInfo.reduxTaskId };
     } catch (error) {
       return error;
@@ -134,7 +135,7 @@ export const changeTaskColumn = createAsyncThunk(
         }),
       });
       const json = await res.json();
-      console.log({ json }, "changeTaskColumn");
+
       return json;
     } catch (error) {
       return error;
@@ -156,7 +157,6 @@ export const deleteTaskReq = createAsyncThunk(
         },
       });
       const json = await res.json();
-      console.log({ json });
       return json;
     } catch (error) {
       return error;
@@ -179,7 +179,6 @@ export const editTaskReq = createAsyncThunk(
         body: JSON.stringify({ task }),
       });
       const json = await res.json();
-      console.log({ json });
       return json;
     } catch (error) {
       return error;
@@ -202,7 +201,6 @@ export const createNewBoardReq = createAsyncThunk(
         body: JSON.stringify({ board }),
       });
       const json = await res.json();
-      console.log({ json });
       return json;
     } catch (error) {
       return error;
@@ -215,7 +213,6 @@ export const editBoardReq = createAsyncThunk(
   async (board, { getState }) => {
     const state = getState();
     const token = state.user.user.token;
-    console.log(board);
     try {
       const res = await fetch(`http://localhost:3000/api/boards/${board._id}`, {
         method: "PUT",
@@ -226,7 +223,6 @@ export const editBoardReq = createAsyncThunk(
         body: JSON.stringify({ board }),
       });
       const json = await res.json();
-      console.log({ json });
       return json;
     } catch (error) {
       return error;
@@ -251,7 +247,6 @@ export const deleteBoardReq = createAsyncThunk(
         }
       );
       const json = await res.json();
-      console.log({ json });
       return json;
     } catch (error) {
       return error;
@@ -296,6 +291,7 @@ export const boardSlice = createSlice({
           tasks: [],
         })),
       };
+      // console.log({ newBoard, pyalod: action.payload }, "creaetboooooo");
       state.boards.push(newBoard);
       state.activeBoard = newBoard;
     },
@@ -311,7 +307,6 @@ export const boardSlice = createSlice({
     },
 
     createTask: (state, action) => {
-      console.log("coming");
       const { task } = action.payload;
       const activeBoard = JSON.parse(JSON.stringify(state.activeBoard));
       const newTask = {
@@ -320,12 +315,11 @@ export const boardSlice = createSlice({
           return { _id: nanoid(), name: subTask, isDone: false };
         }),
       };
-      console.log({ newTask });
+
       const columnIndex = activeBoard.columns.findIndex(
         (col) => col._id === newTask.column
       );
       if (columnIndex === -1) return state;
-      console.log({ columnIndex, newTask });
       state.activeBoard.columns[columnIndex].tasks.push(newTask);
     },
 
@@ -405,7 +399,6 @@ export const boardSlice = createSlice({
 
     editBoard: (state, action) => {
       const { board } = action.payload;
-      console.log({ board }, "editBoard");
       board.columns = board.columns.map((col) => {
         if (!col._id) {
           return { ...col, _id: nanoid(), tasks: [] };
@@ -424,7 +417,6 @@ export const boardSlice = createSlice({
     removeTask: (state, action) => {
       const { columnIndex } = state.selectedTask;
       const deleteTaskId = action.payload;
-      console.log({ deleteTaskId });
       state.activeBoard.columns[columnIndex].tasks = state.activeBoard.columns[
         columnIndex
       ].tasks.filter((t) => t._id !== deleteTaskId);
@@ -435,12 +427,11 @@ export const boardSlice = createSlice({
       state.boards = state.boards.filter(
         (board) => board._id !== deleteBoardId
       );
-      const board = state.boards[0] === undefined ? "" : state.boards[0];
+      const board = state.boards[0] === undefined ? null : state.boards[0];
       localStorage.setItem("board", JSON.stringify(board));
     },
 
     moveTask: (state, action) => {
-      console.log(action.payload);
       const activeBoard = JSON.parse(JSON.stringify(state.activeBoard));
       const {
         taskId,
@@ -480,6 +471,13 @@ export const boardSlice = createSlice({
 
       state.activeBoard = activeBoard;
     },
+
+    boardLogout: (state, action) => {
+      // state = { boards: [], activeBoard: {}, selectedTask: "" };
+      state.boards = [];
+      state.activeBoard = {};
+      state.selectedTask = "";
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchBoards.fulfilled, (state, action) => {
@@ -488,8 +486,16 @@ export const boardSlice = createSlice({
     });
 
     builder.addCase(fetchColumns.fulfilled, (state, action) => {
-      console.log(action.payload, "fetch columns");
       if (action.payload) {
+        console.log(action.payload, "fetchcolums");
+        state.activeBoard.columns = action.payload;
+      }
+    });
+
+    builder.addCase(fetchColumns.rejected, (state, action) => {
+      console.log("coming here ");
+      if (action.payload) {
+        console.log(action.payload, "fetchcolums");
         state.activeBoard.columns = action.payload;
       }
     });
@@ -503,7 +509,6 @@ export const boardSlice = createSlice({
         (t) => t._id === reduxTaskId
       );
       state.activeBoard.columns[columnIndex].tasks[taskIndex] = task;
-      console.log(task, columnIndex, taskIndex, reduxTaskId);
     });
 
     builder.addCase(postNewTask.rejected, (state, action) => {
@@ -547,6 +552,7 @@ export const boardSlice = createSlice({
 
     builder.addCase(createNewBoardReq.fulfilled, (state, action) => {
       const board = action.payload.board;
+      console.log({ board });
       state.boards[state.boards.length - 1] = {
         _id: board._id,
         name: board.name,
@@ -561,6 +567,11 @@ export const boardSlice = createSlice({
         })
       );
       state.activeBoard._id = board._id;
+      console.log(
+        state.activeBoard.columns.map((col) => {
+          return { ...col };
+        })
+      );
       state.activeBoard.columns = state.activeBoard.columns.map((col, idx) => ({
         ...col,
         _id: board.columns[idx],
@@ -590,5 +601,6 @@ export const {
   createBoard,
   deleteBoard,
   moveTask,
+  boardLogout,
 } = boardSlice.actions;
 export default boardSlice.reducer;
