@@ -214,7 +214,7 @@ export default function CreateNewTask() {
                                : "border-gray-300"
                            }`}
                           type="text"
-                          placeholder="column name"
+                          placeholder="subtask name"
                           value={subTask}
                           onChange={(e) => handleSubTaskInput(e, index)}
                         />

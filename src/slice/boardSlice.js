@@ -1,4 +1,12 @@
 import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
+import {
+  createNewTaskURL,
+  ROOT_URL,
+  fetchBoardsURL,
+  changeTaskColumnURL,
+  createNewBoardURL,
+  moveTaskURL,
+} from "../utils/constant";
 
 const initialState = {
   boards: [],
@@ -12,7 +20,7 @@ export const fetchBoards = createAsyncThunk(
     try {
       const state = getState();
       const token = state.user.user.token;
-      const res = await fetch("http://localhost:3000/api/boards/allboards", {
+      const res = await fetch(fetchBoardsURL, {
         method: "GET",
         headers: { authorization: `Token ${token}` },
       });
@@ -35,13 +43,10 @@ export const fetchColumns = createAsyncThunk(
         return;
       }
       const promise = columns.map(async (columnId) => {
-        const res = await fetch(
-          `http://localhost:3000/api/columns/${columnId}`,
-          {
-            method: "GET",
-            headers: { authorization: `Token ${token}` },
-          }
-        );
+        const res = await fetch(`${ROOT_URL}/columns/${columnId}`, {
+          method: "GET",
+          headers: { authorization: `Token ${token}` },
+        });
         if (!res.ok) {
           throw new Error("No column found with this ${columnId}");
         }
@@ -63,7 +68,7 @@ export const postNewTask = createAsyncThunk(
     try {
       const state = getState();
       const token = state.user.user.token;
-      const res = await fetch("http://localhost:3000/api/tasks", {
+      const res = await fetch(createNewTaskURL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -87,21 +92,18 @@ export const postChangeIsDone = createAsyncThunk(
     const state = getState();
     const token = state.user.user.token;
     try {
-      const res = await fetch(
-        `http://localhost:3000/api/subTasks/${subTask.subTaskId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            authorization: `Token ${token}`,
+      const res = await fetch(`${ROOT_URL}/subTasks/${subTask.subTaskId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Token ${token}`,
+        },
+        body: JSON.stringify({
+          subTask: {
+            isDone: subTask.isDone,
           },
-          body: JSON.stringify({
-            subTask: {
-              isDone: subTask.isDone,
-            },
-          }),
-        }
-      );
+        }),
+      });
       const json = await res.json();
       return json.subTask;
     } catch (error) {
@@ -120,7 +122,7 @@ export const changeTaskColumn = createAsyncThunk(
       state.board.activeBoard.columns[columnIndex].tasks[taskIndex];
 
     try {
-      const res = await fetch(`http://localhost:3000/api/tasks/changeColumn`, {
+      const res = await fetch(changeTaskColumnURL, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -149,7 +151,7 @@ export const deleteTaskReq = createAsyncThunk(
     const state = getState();
     const token = state.user.user.token;
     try {
-      const res = await fetch(`http://localhost:3000/api/tasks/${taskId}`, {
+      const res = await fetch(`${ROOT_URL}/tasks/${taskId}`, {
         method: "delete",
         headers: {
           "Content-Type": "application/json",
@@ -170,7 +172,7 @@ export const editTaskReq = createAsyncThunk(
     const state = getState();
     const token = state.user.user.token;
     try {
-      const res = await fetch(`http://localhost:3000/api/tasks/${task._id}`, {
+      const res = await fetch(`${ROOT_URL}/tasks/${task._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -192,7 +194,7 @@ export const createNewBoardReq = createAsyncThunk(
     const state = getState();
     const token = state.user.user.token;
     try {
-      const res = await fetch(`http://localhost:3000/api/boards`, {
+      const res = await fetch(createNewBoardURL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -214,7 +216,7 @@ export const editBoardReq = createAsyncThunk(
     const state = getState();
     const token = state.user.user.token;
     try {
-      const res = await fetch(`http://localhost:3000/api/boards/${board._id}`, {
+      const res = await fetch(`${ROOT_URL}/boards/${board._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -236,16 +238,13 @@ export const deleteBoardReq = createAsyncThunk(
     const state = getState();
     const token = state.user.user.token;
     try {
-      const res = await fetch(
-        `http://localhost:3000/api/boards/${deleteBoardId}`,
-        {
-          method: "delete",
-          headers: {
-            "Content-Type": "application/json",
-            authorization: `Token ${token}`,
-          },
-        }
-      );
+      const res = await fetch(`${ROOT_URL}/boards/${deleteBoardId}`, {
+        method: "delete",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Token ${token}`,
+        },
+      });
       const json = await res.json();
       return json;
     } catch (error) {
@@ -260,7 +259,7 @@ export const moveTaskReq = createAsyncThunk(
     const state = getState();
     const token = state.user.user.token;
     try {
-      const res = await fetch(`http://localhost:3000/api/tasks/moveTask`, {
+      const res = await fetch(moveTaskURL, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
