@@ -5,9 +5,12 @@ import { DragDropContext } from "react-beautiful-dnd";
 import { moveTask, moveTaskReq } from "./slice/boardSlice";
 import BoardEmpty from "./components/BoardEmpty";
 import NoBoardAlert from "./components/NoBoardAlert";
+import Loader from "./components/Loader";
 
 function Board() {
-  const { activeBoard, boards } = useSelector((state) => state.board);
+  const { activeBoard, boards, moveTaskLoading } = useSelector(
+    (state) => state.board
+  );
   const columns = activeBoard?.columns;
   const dispatch = useDispatch();
   const { theme } = useSelector((state) => state.theme);
@@ -17,11 +20,14 @@ function Board() {
   }
 
   function handleDragEnd(e) {
-    const taskId = e.draggableId;
-    const destinationColumn = e.destination.droppableId;
-    const destinationIndex = e.destination.index;
-    const sourceColumn = e.source.droppableId;
-    const dragIndex = e.source.index;
+    const taskId = e?.draggableId;
+    const destinationColumn = e?.destination?.droppableId;
+    const destinationIndex = e?.destination?.index;
+    const sourceColumn = e?.source?.droppableId;
+    const dragIndex = e?.source?.index;
+    if (sourceColumn === destinationColumn && dragIndex === destinationIndex) {
+      return;
+    }
 
     dispatch(
       moveTask({
@@ -39,6 +45,14 @@ function Board() {
       destinationIndex,
     };
     dispatch(moveTaskReq(moveInfo));
+  }
+
+  if (moveTaskLoading) {
+    return (
+      <div className="flex justify-center items-center gap-4 h-full">
+        <Loader />
+      </div>
+    );
   }
 
   return (

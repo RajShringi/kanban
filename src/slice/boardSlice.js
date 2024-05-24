@@ -12,6 +12,9 @@ const initialState = {
   boards: [],
   activeBoard: {},
   selectedTask: "",
+  moveTaskLoading: false,
+  fetchBoardsLoading: false,
+  fetchColumnsLoading: false,
 };
 
 export const fetchBoards = createAsyncThunk(
@@ -479,15 +482,22 @@ export const boardSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    builder.addCase(fetchBoards.pending, (state, action) => {
+      state.fetchBoardsLoading = true;
+    });
     builder.addCase(fetchBoards.fulfilled, (state, action) => {
       state.boards = action.payload.boards;
+      state.fetchBoardsLoading = false;
       // localStorage.setItem("board", JSON.stringify(action.payload.boards[0]));
     });
-
+    builder.addCase(fetchColumns.pending, (state, action) => {
+      state.fetchColumnsLoading = true;
+    });
     builder.addCase(fetchColumns.fulfilled, (state, action) => {
       if (action.payload) {
         console.log(action.payload, "fetchcolums");
         state.activeBoard.columns = action.payload;
+        state.fetchColumnsLoading = false;
       }
     });
 
@@ -582,7 +592,11 @@ export const boardSlice = createSlice({
       console.log(action.payload, "deleteBoardreq");
     });
 
+    builder.addCase(moveTaskReq.pending, (state, action) => {
+      state.moveTaskLoading = true;
+    });
     builder.addCase(moveTaskReq.fulfilled, (state, action) => {
+      state.moveTaskLoading = false;
       console.log("task moved successfully");
     });
   },

@@ -11,6 +11,7 @@ import TaskDetailsModal from "./components/TaskDetailsModal";
 import EditTask from "./components/EditTask";
 import { FaRegEye } from "react-icons/fa6";
 import { changeTheme } from "./slice/themeSlice";
+import Loader from "./components/Loader";
 
 function App() {
   const [headerHeight, setHeaderHeight] = useState(0);
@@ -25,6 +26,9 @@ function App() {
     isTaskDetailsVisible,
   } = useSelector((state) => state.modal);
   const { theme } = useSelector((state) => state.theme);
+  const { fetchBoardsLoading, fetchColumnsLoading } = useSelector(
+    (state) => state.board
+  );
 
   useEffect(() => {
     const header = document.querySelector(".header");
@@ -63,28 +67,32 @@ function App() {
     <div
       className={`flex flex-col min-h-screen   ${
         theme === "dark"
-          ? "bg-gray-700 text-white"
+          ? "bg-[#2b2c37] text-white"
           : "bg-[#f4f7fd] text-gray-900"
       }`}
     >
       <Header />
-      <div className="flex flex-1">
-        <div
-          className={`flex-[20%] max-w-[300px] ${
-            isSidebarHidden ? "hidden" : "block"
-          }`}
-        >
-          <Sidebar setIsSidebarHidden={setIsSidebarHidden} />
+      {fetchBoardsLoading && fetchColumnsLoading ? (
+        <Loader />
+      ) : (
+        <div className="flex flex-1">
+          <div
+            className={`flex-[20%] max-w-[300px] ${
+              isSidebarHidden ? "hidden" : "block"
+            }`}
+          >
+            <Sidebar setIsSidebarHidden={setIsSidebarHidden} />
+          </div>
+          <div
+            className={`flex-[80%] flex flex-col overflow-auto  board-container ${
+              theme === "dark" ? "bg-[#20212c]" : "bg-[#e4ebfa]"
+            }`}
+            style={{ height: `${boardMaxHeight}px` }}
+          >
+            <Board />
+          </div>
         </div>
-        <div
-          className={`flex-[80%] flex flex-col overflow-auto  board-container ${
-            theme === "dark" ? "bg-[#20212c]" : "bg-[#e4ebfa]"
-          }`}
-          style={{ height: `${boardMaxHeight}px` }}
-        >
-          <Board />
-        </div>
-      </div>
+      )}
 
       {isSidebarHidden && (
         <button
