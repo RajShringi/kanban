@@ -90,9 +90,13 @@ export const userSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    builder.addCase(userLogin.pending, (state, action) => {
+      state.loading = true;
+    });
     builder.addCase(userLogin.fulfilled, (state, action) => {
       state.user = action.payload;
       state.errMsg = {};
+      state.loading = false;
       localStorage.setItem("user", JSON.stringify(action.payload));
     });
     builder.addCase(userLogin.rejected, (state, action) => {
@@ -104,10 +108,15 @@ export const userSlice = createSlice({
         state.errMsg.email = "Email is not found";
       }
       state.errMsg.err = action.payload;
+      state.loading = false;
+    });
+    builder.addCase(userRegister.pending, (state, action) => {
+      state.loading = true;
     });
     builder.addCase(userRegister.fulfilled, (state, action) => {
       state.user = action.payload;
       state.errMsg = {};
+      state.loading = false;
       localStorage.setItem("user", JSON.stringify(action.payload));
     });
     builder.addCase(userRegister.rejected, (state, action) => {
@@ -119,6 +128,7 @@ export const userSlice = createSlice({
         state.errMsg.username = "User with this username already exist";
       }
       state.errMsg.err = action.payload;
+      state.loading = false;
     });
   },
 });

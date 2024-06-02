@@ -5,10 +5,11 @@ import kanbanDarkImage from "../assets/kanban-dark-logo.svg";
 import { Link, Navigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { resetError, userLogin } from "../slice/userSlice";
+import Loader from "./Loader";
 
 export default function Login() {
   const { theme } = useSelector((state) => state.theme);
-  const { user, errMsg } = useSelector((state) => state.user);
+  const { user, errMsg, loading } = useSelector((state) => state.user);
   const { boards } = useSelector((state) => state.board);
   const [userInfo, setUserInfo] = useState({
     email: "",
@@ -63,20 +64,20 @@ export default function Login() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    // if (!validate()) {
-    //   console.log(errors);
-    //   console.log(userInfo);
-    //   return;
-    // }
-    // if (Object.keys(errMsg).length !== 0) {
-    //   if (errMsg.email) {
-    //     SetErrors((prev) => ({ ...prev, emailErr: `Email is not found` }));
-    //   }
-    //   if (errMsg.password) {
-    //     SetErrors((prev) => ({ ...prev, emailErr: `Password is incorrect` }));
-    //   }
-    //   return;
-    // }
+    if (!validate()) {
+      console.log(errors);
+      console.log(userInfo);
+      return;
+    }
+    if (Object.keys(errMsg).length !== 0) {
+      if (errMsg.email) {
+        SetErrors((prev) => ({ ...prev, emailErr: `Email is not found` }));
+      }
+      if (errMsg.password) {
+        SetErrors((prev) => ({ ...prev, emailErr: `Password is incorrect` }));
+      }
+      return;
+    }
     const result = await dispatch(userLogin(userInfo));
 
     if (result.meta.requestStatus === "fulfilled") {
@@ -163,7 +164,7 @@ export default function Login() {
             onClick={handleSubmit}
             className="block mt-4 w-full bg-[#635fc7] hover:bg-[#635fc8c9] text-white px-6 py-3 rounded-full font-bold"
           >
-            Sign In
+            {loading ? <Loader asButton={true} /> : "Sign In"}
           </button>
         </form>
         <div className="flex items-center justify-center">

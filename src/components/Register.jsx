@@ -5,10 +5,11 @@ import { useSelector } from "react-redux";
 import { Link, Navigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { resetError, userRegister } from "../slice/userSlice";
+import Loader from "./Loader";
 
 export default function Register() {
   const { theme } = useSelector((state) => state.theme);
-  const { user, errMsg } = useSelector((state) => state.user);
+  const { user, errMsg, loading } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [userInfo, setUserInfo] = useState({
     username: "",
@@ -183,7 +184,7 @@ export default function Register() {
             onClick={handleSubmit}
             className="block mt-4 w-full bg-[#635fc7] hover:bg-[#635fc8c9] text-white px-6 py-3 rounded-full font-bold"
           >
-            Register
+            {loading ? <Loader asButton={true} /> : "Register"}
           </button>
         </form>
         <div className="flex items-center justify-center">
