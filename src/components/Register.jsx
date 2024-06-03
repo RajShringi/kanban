@@ -182,7 +182,8 @@ export default function Register() {
 
           <button
             onClick={handleSubmit}
-            className="block mt-4 w-full bg-[#635fc7] hover:bg-[#635fc8c9] text-white px-6 py-3 rounded-full font-bold"
+            disabled={loading}
+            className="block mt-4 w-full bg-[#635fc7] hover:bg-[#635fc8c9] text-white px-6 py-3 rounded-full font-bold disabled:cursor-not-allowed"
           >
             {loading ? <Loader asButton={true} /> : "Register"}
           </button>
