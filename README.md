@@ -1,8 +1,51 @@
-# React + Vite
+# Kanban
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+#### Features
 
-Currently, two official plugins are available:
+- Create, read, update, and delete boards and tasks
+- Receive form validations when trying to create/edit boards and tasks
+- Mark subtasks as complete and move tasks between columns
+- Hide/show the board sidebar
+- Toggle the theme between light/dark modes
+- users can drag and drop tasks to change their status and re-order them in a column
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## API
+
+https://github.com/RajShringi/kanban-api
+
+## Build/Run
+
+#### Requirements
+
+- Node.js
+- NPM
+
+First, clone the project
+
+```
+git clone https://github.com/RajShringi/kanban
+```
+
+Go to project directory
+
+```
+cd kanban
+```
+
+Install the needed package
+
+```
+npm install
+or
+yarn
+```
+
+Start the React Application
+
+```
+npm start
+or
+yarn start
+```
+
+<div align="center"><p> porject by <a href="https://twitter.com/RajShringi1">Raj Shringi</a></p></div>
