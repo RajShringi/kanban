@@ -66,7 +66,9 @@ function Header() {
         )}
       </div>
       <div className="flex-[80%] flex justify-between items-center px-4 py-6">
-        <h2 className="font-bold text-2xl">Platform Launch</h2>
+        <h2 className="font-bold text-2xl">
+          {activeBoard ? activeBoard.name : ""}
+        </h2>
         <div className="space-x-4 flex items-center relative">
           <button
             className="bg-[#635fc7] hover:bg-[#635fc8c9] text-white px-6 py-3 rounded-full font-bold disabled:cursor-not-allowed"
