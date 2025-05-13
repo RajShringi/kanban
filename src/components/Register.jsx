@@ -170,7 +170,7 @@ export default function Register() {
               }
               
               ${theme === "dark" ? "bg-[#2b2c37] " : "bg-white "}`}
-              type="text"
+              type="password"
               placeholder="password"
               name="password"
               value={userInfo.password}
