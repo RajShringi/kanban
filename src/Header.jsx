@@ -30,7 +30,6 @@ function Header() {
       if (user) {
         const result = await dispatch(fetchBoards());
         if (result.meta.requestStatus === "fulfilled") {
-          console.log(result, "header");
           const boards = result?.payload?.boards;
           const board = JSON.parse(localStorage.getItem("board"));
           if (boards.length > 0 && !board) {

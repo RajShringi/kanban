@@ -38,7 +38,6 @@ export const fetchBoards = createAsyncThunk(
 export const fetchColumns = createAsyncThunk(
   "board/fetchColumns",
   async (columns, { getState, rejectWithValue }) => {
-    console.log({ columns }, "fetchcolums req");
     try {
       const state = getState();
       const token = state.user.user.token;
@@ -293,7 +292,6 @@ export const boardSlice = createSlice({
           tasks: [],
         })),
       };
-      // console.log({ newBoard, pyalod: action.payload }, "creaetboooooo");
       state.boards.push(newBoard);
       state.activeBoard = newBoard;
     },
@@ -495,16 +493,13 @@ export const boardSlice = createSlice({
     });
     builder.addCase(fetchColumns.fulfilled, (state, action) => {
       if (action.payload) {
-        console.log(action.payload, "fetchcolums");
         state.activeBoard.columns = action.payload;
         state.fetchColumnsLoading = false;
       }
     });
 
     builder.addCase(fetchColumns.rejected, (state, action) => {
-      console.log("coming here ");
       if (action.payload) {
-        console.log(action.payload, "fetchcolums");
         state.activeBoard.columns = action.payload;
       }
     });
@@ -524,16 +519,11 @@ export const boardSlice = createSlice({
       //handle error;
     });
 
-    builder.addCase(postChangeIsDone.fulfilled, (state, action) => {
-      console.log(action, "postChangeIsDone");
-    });
     builder.addCase(changeTaskColumn.fulfilled, (state, action) => {
-      console.log(action, "changeTaskColumn");
       state.selectedTask = "";
     });
 
     builder.addCase(deleteTaskReq.fulfilled, (state, action) => {
-      console.log(action, "deleteTask Req");
       state.selectedTask = "";
     });
 
@@ -561,7 +551,6 @@ export const boardSlice = createSlice({
 
     builder.addCase(createNewBoardReq.fulfilled, (state, action) => {
       const board = action.payload.board;
-      console.log({ board });
       state.boards[state.boards.length - 1] = {
         _id: board._id,
         name: board.name,
@@ -576,20 +565,10 @@ export const boardSlice = createSlice({
         })
       );
       state.activeBoard._id = board._id;
-      console.log(
-        state.activeBoard.columns.map((col) => {
-          return { ...col };
-        })
-      );
       state.activeBoard.columns = state.activeBoard.columns.map((col, idx) => ({
         ...col,
         _id: board.columns[idx],
       }));
-      console.log(board, "createnewboardreq");
-    });
-
-    builder.addCase(deleteBoardReq.fulfilled, (state, action) => {
-      console.log(action.payload, "deleteBoardreq");
     });
 
     builder.addCase(moveTaskReq.pending, (state, action) => {
@@ -597,7 +576,6 @@ export const boardSlice = createSlice({
     });
     builder.addCase(moveTaskReq.fulfilled, (state, action) => {
       state.moveTaskLoading = false;
-      console.log("task moved successfully");
     });
   },
 });

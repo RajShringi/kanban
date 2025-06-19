@@ -20,7 +20,7 @@ function Sidebar({ setIsSidebarHidden }) {
     >
       <div className="space-y-4">
         <h4 className="uppercase text-gray-500 px-6 font-semibold text-sm tracking-widest">
-          All Board (3)
+          All Boards
         </h4>
         <AllBoards />
       </div>
