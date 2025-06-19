@@ -1,5 +1,7 @@
 # Kanban
 
+https://github.com/user-attachments/assets/180f6f43-f3b5-4b50-8219-a5c4594f46a6
+
 #### Features
 
 - Create, read, update, and delete boards and tasks
@@ -7,7 +9,7 @@
 - Mark subtasks as complete and move tasks between columns
 - Hide/show the board sidebar
 - Toggle the theme between light/dark modes
-- users can drag and drop tasks to change their status and re-order them in a column
+- Users can drag and drop tasks to change their status and re-order them in a column
 
 ## API
 
@@ -26,7 +28,7 @@ First, clone the project
 git clone https://github.com/RajShringi/kanban
 ```
 
-Go to project directory
+Go to the project directory
 
 ```
 cd kanban
